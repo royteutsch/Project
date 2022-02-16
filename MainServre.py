@@ -1,6 +1,7 @@
 import select
 import logging
 import socket
+import pickle
 
 SERVER_PORT = 5555
 SERVER_IP = '0.0.0.0'
@@ -20,8 +21,12 @@ def newclient(current_socket, client_sockets):
     print_client_sockets(client_sockets)
 
 
-def client_mesege(current_socket, client_sockets, answer, num):
-    rsv = current_socket.recv(1024).decode()  # get the client messege, do what ever u want with it--->
+def client_messege(current_socket: socket.socket):
+    command = current_socket.recv(1).decode()  # get the request the client wants us to do
+    # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE), "F" (END OF LOBBY, GET THE ARCHIVE "F"ILE),
+    # TODO: "L" (NEW LOBBY, SEND UNIQUE ID)
+    if command == "L":  # A new lobby has just sent this, send back a unique id for it
+        current_socket.send(str(lobby_id).zfill(12))
 
 
 logging.debug("Setting up server...")
@@ -33,6 +38,9 @@ client_sockets = []
 messages_to_send = []
 # place for parameters
 
+lobby_id = 0  # Will be zfilled to 12 chars for every lobby, then increased by 1.
+# This ensures 1,000,000,000,000 unique id's
+
 
 while True:
     rlist, wlist, xlist = select.select([server_socket] + client_sockets, client_sockets, [])
@@ -40,6 +48,7 @@ while True:
         if current_socket is server_socket:  # new client joins
             newclient(current_socket, client_sockets)  # create new client
         else:  # what to do with new client
+            client_messege(current_socket)
 
     for message in messages_to_send:
         current_socket, data = message
