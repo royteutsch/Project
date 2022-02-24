@@ -10,7 +10,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
-import LobbyManagerGUI_support
+# import LobbyManagerGUI_support
 
 class Toplevel1:
     def __init__(self, top=None):
@@ -25,7 +25,7 @@ class Toplevel1:
         top.geometry("808x450+560+213")
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
-        top.resizable(1,  1)
+        top.resizable(0,  0)
         top.title("Toplevel 0")
         top.configure(background="#d9d9d9")
 
@@ -124,11 +124,13 @@ class Toplevel1:
         self.StartSessionButton.configure(pady="0")
         self.StartSessionButton.configure(text='''Start Session''')
 
-def start_up():
-    LobbyManagerGUI_support.main()
+# def start_up():
+#     LobbyManagerGUI_support.main()
 
 if __name__ == '__main__':
-    LobbyManagerGUI_support.main()
+    root = tk.Tk()
+    t = Toplevel1(root)
+    root.mainloop()
 
 
 

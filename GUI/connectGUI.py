@@ -10,7 +10,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
-import connectGUI_support
+# import connectGUI_support
 
 class Toplevel1:
     def __init__(self, top=None):
@@ -63,11 +63,13 @@ class Toplevel1:
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect''')
 
-def start_up():
-    connectGUI_support.main()
+# def start_up():
+#    connectGUI_support.main()
 
 if __name__ == '__main__':
-    connectGUI_support.main()
+    root = tk.Tk()
+    t = Toplevel1(root)
+    root.mainloop()
 
 
 

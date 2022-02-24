@@ -6,11 +6,13 @@
 #    Feb 23, 2022 02:05:48 PM +0200  platform: Windows NT
 
 import sys
+import tkinter
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
-import mainGUI_support
+# import mainGUI_support
+
 
 class Toplevel1:
     def __init__(self, top=None):
@@ -25,11 +27,12 @@ class Toplevel1:
         top.geometry("885x531+479+210")
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
-        top.resizable(1,  1)
-        top.title("Toplevel 0")
+        top.resizable(0,  0)
+        top.title("Project")
         top.configure(background="#d9d9d9")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
+
 
         self.top = top
 
@@ -323,12 +326,13 @@ class Toplevel1:
         self.ParamButton.configure(image=_img5)
         self.ParamButton.configure(pady="0")
 
-def start_up():
-    mainGUI_support.main()
+# def start_up():
+#     mainGUI_support.main()
 
 if __name__ == '__main__':
-    mainGUI_support.main()
-
+    root = tkinter.Tk()
+    t = Toplevel1(root)
+    root.mainloop()
 
 
 

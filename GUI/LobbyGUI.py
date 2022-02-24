@@ -8,12 +8,13 @@
 import sys
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter.constants import *
+import LoginGUI
+import connectGUI
+import LobbyCreationGUI
 
-import LobbyGUI_support
 
 class Toplevel1:
-    def __init__(self, top=None):
+    def __init__(self, top=None, Username=None, Password=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -31,72 +32,102 @@ class Toplevel1:
 
         self.top = top
 
-        self.Label1 = tk.Label(self.top)
-        self.Label1.place(relx=0.017, rely=0.022, height=31, width=584)
-        self.Label1.configure(anchor='w')
-        self.Label1.configure(background="#d9d9d9")
-        self.Label1.configure(compound='left')
-        self.Label1.configure(disabledforeground="#a3a3a3")
-        self.Label1.configure(font="-family {David} -size 18")
-        self.Label1.configure(foreground="#000000")
-        self.Label1.configure(text='''Current User:''')
+        self.Username = Username.get()
+        self.Password = Password.get()
 
-        self.Button1 = tk.Button(self.top)
-        self.Button1.place(relx=0.033, rely=0.089, height=44, width=117)
-        self.Button1.configure(activebackground="#ececec")
-        self.Button1.configure(activeforeground="#000000")
-        self.Button1.configure(anchor='w')
-        self.Button1.configure(background="#d9d9d9")
-        self.Button1.configure(compound='left')
-        self.Button1.configure(disabledforeground="#a3a3a3")
-        self.Button1.configure(font="-family {David} -size 18")
-        self.Button1.configure(foreground="#000000")
-        self.Button1.configure(highlightbackground="#d9d9d9")
-        self.Button1.configure(highlightcolor="black")
-        self.Button1.configure(pady="0")
-        self.Button1.configure(text='''Disconnect''')
+        self.UserLabel = tk.Label(self.top)
+        self.UserLabel.place(relx=0.017, rely=0.022, height=31, width=584)
+        self.UserLabel.configure(anchor='w')
+        self.UserLabel.configure(background="#d9d9d9")
+        self.UserLabel.configure(compound='left')
+        self.UserLabel.configure(disabledforeground="#a3a3a3")
+        self.UserLabel.configure(font="-family {David} -size 18")
+        self.UserLabel.configure(foreground="#000000")
+        self.UserLabel.configure(text="Current User:" + self.Username)
 
-        self.Frame1 = tk.Frame(self.top)
-        self.Frame1.place(relx=0.183, rely=0.267, relheight=0.656
-                , relwidth=0.658)
-        self.Frame1.configure(relief='groove')
-        self.Frame1.configure(borderwidth="2")
-        self.Frame1.configure(relief="groove")
-        self.Frame1.configure(background="#d9d9d9")
+        self.DisconnectButton = tk.Button(self.top)
+        self.DisconnectButton.place(relx=0.033, rely=0.089, height=44, width=117)
+        self.DisconnectButton.configure(activebackground="#ececec")
+        self.DisconnectButton.configure(activeforeground="#000000")
+        self.DisconnectButton.configure(anchor='w')
+        self.DisconnectButton.configure(background="#d9d9d9")
+        self.DisconnectButton.configure(compound='left')
+        self.DisconnectButton.configure(disabledforeground="#a3a3a3")
+        self.DisconnectButton.configure(font="-family {David} -size 18")
+        self.DisconnectButton.configure(foreground="#000000")
+        self.DisconnectButton.configure(highlightbackground="#d9d9d9")
+        self.DisconnectButton.configure(highlightcolor="black")
+        self.DisconnectButton.configure(pady="0")
+        self.DisconnectButton.configure(text='''Disconnect''')
+        self.DisconnectButton.configure(command=lambda: self.Disconnect())
 
-        self.Button2 = tk.Button(self.Frame1)
-        self.Button2.place(relx=0.025, rely=0.034, height=134, width=377)
-        self.Button2.configure(activebackground="#ececec")
-        self.Button2.configure(activeforeground="#000000")
-        self.Button2.configure(background="#d9d9d9")
-        self.Button2.configure(compound='left')
-        self.Button2.configure(disabledforeground="#a3a3a3")
-        self.Button2.configure(font="-family {David} -size 20 -weight bold")
-        self.Button2.configure(foreground="#000000")
-        self.Button2.configure(highlightbackground="#d9d9d9")
-        self.Button2.configure(highlightcolor="black")
-        self.Button2.configure(pady="0")
-        self.Button2.configure(text='''Connect to Existing Lobby''')
+        self.LobbyFrame = tk.Frame(self.top)
+        self.LobbyFrame.place(relx=0.183, rely=0.267, relheight=0.656
+                              , relwidth=0.658)
+        self.LobbyFrame.configure(relief='groove')
+        self.LobbyFrame.configure(borderwidth="2")
+        self.LobbyFrame.configure(relief="groove")
+        self.LobbyFrame.configure(background="#d9d9d9")
 
-        self.Button3 = tk.Button(self.Frame1)
-        self.Button3.place(relx=0.025, rely=0.508, height=134, width=377)
-        self.Button3.configure(activebackground="#ececec")
-        self.Button3.configure(activeforeground="#000000")
-        self.Button3.configure(background="#d9d9d9")
-        self.Button3.configure(compound='left')
-        self.Button3.configure(disabledforeground="#a3a3a3")
-        self.Button3.configure(font="-family {David} -size 20 -weight bold")
-        self.Button3.configure(foreground="#000000")
-        self.Button3.configure(highlightbackground="#d9d9d9")
-        self.Button3.configure(highlightcolor="black")
-        self.Button3.configure(pady="0")
-        self.Button3.configure(text='''Create New Lobby''')
+        self.ConnectButton = tk.Button(self.LobbyFrame)
+        self.ConnectButton.place(relx=0.025, rely=0.034, height=134, width=377)
+        self.ConnectButton.configure(activebackground="#ececec")
+        self.ConnectButton.configure(activeforeground="#000000")
+        self.ConnectButton.configure(background="#d9d9d9")
+        self.ConnectButton.configure(compound='left')
+        self.ConnectButton.configure(disabledforeground="#a3a3a3")
+        self.ConnectButton.configure(font="-family {David} -size 20 -weight bold")
+        self.ConnectButton.configure(foreground="#000000")
+        self.ConnectButton.configure(highlightbackground="#d9d9d9")
+        self.ConnectButton.configure(highlightcolor="black")
+        self.ConnectButton.configure(pady="0")
+        self.ConnectButton.configure(text='''Connect to Existing Lobby''')
+        self.ConnectButton.configure(command=lambda: self.ConnectToLobby())
 
-def start_up():
-    LobbyGUI_support.main()
+        self.CreateButton = tk.Button(self.LobbyFrame)
+        self.CreateButton.place(relx=0.025, rely=0.508, height=134, width=377)
+        self.CreateButton.configure(activebackground="#ececec")
+        self.CreateButton.configure(activeforeground="#000000")
+        self.CreateButton.configure(background="#d9d9d9")
+        self.CreateButton.configure(compound='left')
+        self.CreateButton.configure(disabledforeground="#a3a3a3")
+        self.CreateButton.configure(font="-family {David} -size 20 -weight bold")
+        self.CreateButton.configure(foreground="#000000")
+        self.CreateButton.configure(highlightbackground="#d9d9d9")
+        self.CreateButton.configure(highlightcolor="black")
+        self.CreateButton.configure(pady="0")
+        self.CreateButton.configure(text='''Create New Lobby''')
+        self.CreateButton.configure(command=lambda: self.CreateLobby())
+
+    def DeleteSelf(self):
+        # Remove Everything from the root
+        self.UserLabel.destroy()
+        self.LobbyFrame.destroy()
+        self.DisconnectButton.destroy()
+
+    def Disconnect(self):
+        self.DeleteSelf()
+        # Add the GUI from LobbyGUI
+        LoginGUI.Toplevel1(self.top)
+
+    def ConnectToLobby(self):
+        self.DeleteSelf()
+        # Add the GUI from connectGUI
+        connectGUI.Toplevel1(self.top)
+
+    def CreateLobby(self):
+        self.DeleteSelf()
+        # Add the GUI from LobbyCreationGUI
+        LobbyCreationGUI.Toplevel1(self.top)
+
+
+#def start_up():
+#    LobbyGUI_support.main()
 
 if __name__ == '__main__':
-    LobbyGUI_support.main()
+    root = tk.Tk()
+    t = Toplevel1(root)
+    root.mainloop()
 
 
 

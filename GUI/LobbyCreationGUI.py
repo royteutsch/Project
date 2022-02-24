@@ -10,7 +10,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
-import LobbyCreationGUI_support
+# import LobbyCreationGUI_support
 
 class Toplevel1:
     def __init__(self, top=None):
@@ -84,12 +84,12 @@ class Toplevel1:
         self.LobbyCreationButton.configure(pady="0")
         self.LobbyCreationButton.configure(text='''Create''')
 
-def start_up():
-    LobbyCreationGUI_support.main()
+#def start_up():
+#    LobbyCreationGUI_support.main()
 
 if __name__ == '__main__':
-    LobbyCreationGUI_support.main()
-
-
+    root = tk.Tk()
+    t = Toplevel1(root)
+    root.mainloop()
 
 

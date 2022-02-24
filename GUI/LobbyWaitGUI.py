@@ -10,7 +10,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
-import LobbyWaitGUI_support
+# import LobbyWaitGUI_support
 
 class Toplevel1:
     def __init__(self, top=None):
@@ -51,11 +51,13 @@ class Toplevel1:
         self.Label2.configure(foreground="#000000")
         self.Label2.configure(text='''Please Wait...''')
 
-def start_up():
-    LobbyWaitGUI_support.main()
+#def start_up():
+#    LobbyWaitGUI_support.main()
 
 if __name__ == '__main__':
-    LobbyWaitGUI_support.main()
+    root = tk.Tk()
+    t = Toplevel1(root)
+    root.mainloop()
 
 
 

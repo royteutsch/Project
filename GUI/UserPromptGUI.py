@@ -10,7 +10,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
-import UserPromptGUI_support
+#import UserPromptGUI_support
 
 class Toplevel1:
     def __init__(self, top=None):
@@ -79,11 +79,13 @@ class Toplevel1:
         self.NoButton.configure(pady="0")
         self.NoButton.configure(text='''No''')
 
-def start_up():
-    UserPromptGUI_support.main()
+#def start_up():
+#    UserPromptGUI_support.main()
 
 if __name__ == '__main__':
-    UserPromptGUI_support.main()
+    root = tk.Tk()
+    t = Toplevel1(root)
+    root.mainloop()
 
 
 
