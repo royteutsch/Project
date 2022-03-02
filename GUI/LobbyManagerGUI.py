@@ -11,9 +11,14 @@ import tkinter.ttk as ttk
 from tkinter.constants import *
 
 # import LobbyManagerGUI_support
+from GUI.BaselineGUI import GUI
 
-class Toplevel1:
-    def __init__(self, top=None):
+
+class Toplevel1(GUI):
+    def __init__(self, top=None, params=None):
+        super(Toplevel1, self).__init__()
+        if params is None:
+            params = []
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -29,6 +34,11 @@ class Toplevel1:
         top.title("Toplevel 0")
         top.configure(background="#d9d9d9")
 
+        self.SecStatus = "Public"
+
+        if params[1].get():
+            self.SecStatus = "Private"
+
         self.top = top
 
         self.LobbyName = tk.Label(self.top)
@@ -39,7 +49,8 @@ class Toplevel1:
         self.LobbyName.configure(disabledforeground="#a3a3a3")
         self.LobbyName.configure(font="-family {David} -size 18")
         self.LobbyName.configure(foreground="#000000")
-        self.LobbyName.configure(text='''Name:''')
+        self.LobbyName.configure(text='''Name: ''' + params[0].get())
+        self.widgets.append(self.LobbyName)
 
         self.LobbyID = tk.Label(self.top)
         self.LobbyID.place(relx=0.309, rely=0.156, height=101, width=314)
@@ -50,6 +61,7 @@ class Toplevel1:
         self.LobbyID.configure(font="-family {David} -size 30")
         self.LobbyID.configure(foreground="#000000")
         self.LobbyID.configure(text='''ID:''')
+        self.widgets.append(self.LobbyID)
 
         self.SecLabel = tk.Label(self.top)
         self.SecLabel.place(relx=0.73, rely=0.044, height=41, width=203)
@@ -59,7 +71,8 @@ class Toplevel1:
         self.SecLabel.configure(disabledforeground="#a3a3a3")
         self.SecLabel.configure(font="-family {David} -size 18")
         self.SecLabel.configure(foreground="#000000")
-        self.SecLabel.configure(text='''Security:''')
+        self.SecLabel.configure(text='''Security: ''' + self.SecStatus)
+        self.widgets.append(self.SecLabel)
 
         self.UserListLabel = tk.Label(self.top)
         self.UserListLabel.place(relx=0.037, rely=0.378, height=51, width=604)
@@ -70,6 +83,7 @@ class Toplevel1:
         self.UserListLabel.configure(font="-family {David} -size 18")
         self.UserListLabel.configure(foreground="#000000")
         self.UserListLabel.configure(text='''Connected:''')
+        self.widgets.append(self.UserListLabel)
 
         self.SeeAll = tk.Button(self.top)
         self.SeeAll.place(relx=0.804, rely=0.378, height=44, width=147)
@@ -84,6 +98,7 @@ class Toplevel1:
         self.SeeAll.configure(highlightcolor="black")
         self.SeeAll.configure(pady="0")
         self.SeeAll.configure(text='''See All''')
+        self.widgets.append(self.SeeAll)
 
         self.BGFileLabel = tk.Label(self.top)
         self.BGFileLabel.place(relx=0.037, rely=0.6, height=41, width=363)
@@ -94,6 +109,7 @@ class Toplevel1:
         self.BGFileLabel.configure(font="-family {David} -size 16")
         self.BGFileLabel.configure(foreground="#000000")
         self.BGFileLabel.configure(text='''BG File:''')
+        self.widgets.append(self.BGFileLabel)
 
         self.UploadButton = tk.Button(self.top)
         self.UploadButton.place(relx=0.037, rely=0.733, height=64, width=127)
@@ -108,6 +124,7 @@ class Toplevel1:
         self.UploadButton.configure(highlightcolor="black")
         self.UploadButton.configure(pady="0")
         self.UploadButton.configure(text='''Upload''')
+        self.widgets.append(self.UploadButton)
 
         self.StartSessionButton = tk.Button(self.top)
         self.StartSessionButton.place(relx=0.347, rely=0.689, height=114
@@ -123,6 +140,7 @@ class Toplevel1:
         self.StartSessionButton.configure(highlightcolor="black")
         self.StartSessionButton.configure(pady="0")
         self.StartSessionButton.configure(text='''Start Session''')
+        self.widgets.append(self.StartSessionButton)
 
 # def start_up():
 #     LobbyManagerGUI_support.main()

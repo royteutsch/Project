@@ -15,8 +15,10 @@ from GUI.BaselineGUI import GUI
 
 
 class Toplevel1(GUI):
-    def __init__(self, top=None, params=[]):
+    def __init__(self, top=None, params=None):
         super(Toplevel1, self).__init__()
+        if params is None:
+            params = []
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'

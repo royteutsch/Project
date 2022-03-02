@@ -24,7 +24,7 @@ def newclient(current_socket, client_sockets):
 def client_messege(current_socket: socket.socket):
     command = current_socket.recv(1).decode()  # get the request the client wants us to do
     # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE), "F" (END OF LOBBY, GET THE ARCHIVE "F"ILE),
-    # TODO: "L" (NEW LOBBY, SEND UNIQUE ID)
+    # TODO: "C" ("C"HECK IF MEMBER EXISTS IN DATABASE)
     if command == "L":  # A new lobby has just sent this, send back a unique id for it
         current_socket.send(str(lobby_id).zfill(12))
 

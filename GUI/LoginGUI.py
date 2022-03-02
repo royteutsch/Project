@@ -116,6 +116,7 @@ class Toplevel1(GUI):
         self.ConnectButton.configure(highlightcolor="black")
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect''')
+        # TODO: CHECK IF USER EXISTS IN DATABASE
         self.ConnectButton.configure(command=lambda: self.replaceGUI(LobbyGUI, self.top, [self.Username, self.Password]))
         self.widgets.append(self.ConnectButton)
 
