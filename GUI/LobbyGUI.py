@@ -11,29 +11,31 @@ import tkinter.ttk as ttk
 import LoginGUI
 import connectGUI
 import LobbyCreationGUI
+from GUI.BaselineGUI import GUI
 
 
-class Toplevel1:
-    def __init__(self, top=None, Username=None, Password=None):
+class Toplevel1(GUI):
+    def __init__(self, top=None, params=[]):
+        super(Toplevel1, self).__init__()
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
+        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
         top.geometry("600x450+660+210")
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
-        top.resizable(1,  1)
+        top.resizable(1, 1)
         top.title("Toplevel 0")
         top.configure(background="#d9d9d9")
 
         self.top = top
 
-        self.Username = Username.get()
-        self.Password = Password.get()
+        self.Username = params[0].get()
+        self.Password = params[1].get()
 
         self.UserLabel = tk.Label(self.top)
         self.UserLabel.place(relx=0.017, rely=0.022, height=31, width=584)
@@ -44,6 +46,7 @@ class Toplevel1:
         self.UserLabel.configure(font="-family {David} -size 18")
         self.UserLabel.configure(foreground="#000000")
         self.UserLabel.configure(text="Current User:" + self.Username)
+        self.widgets.append(self.UserLabel)
 
         self.DisconnectButton = tk.Button(self.top)
         self.DisconnectButton.place(relx=0.033, rely=0.089, height=44, width=117)
@@ -59,7 +62,8 @@ class Toplevel1:
         self.DisconnectButton.configure(highlightcolor="black")
         self.DisconnectButton.configure(pady="0")
         self.DisconnectButton.configure(text='''Disconnect''')
-        self.DisconnectButton.configure(command=lambda: self.Disconnect())
+        self.DisconnectButton.configure(command=lambda: self.replaceGUI(LoginGUI, self.top))
+        self.widgets.append(self.DisconnectButton)
 
         self.LobbyFrame = tk.Frame(self.top)
         self.LobbyFrame.place(relx=0.183, rely=0.267, relheight=0.656
@@ -68,6 +72,7 @@ class Toplevel1:
         self.LobbyFrame.configure(borderwidth="2")
         self.LobbyFrame.configure(relief="groove")
         self.LobbyFrame.configure(background="#d9d9d9")
+        self.widgets.append(self.LobbyFrame)
 
         self.ConnectButton = tk.Button(self.LobbyFrame)
         self.ConnectButton.place(relx=0.025, rely=0.034, height=134, width=377)
@@ -82,7 +87,8 @@ class Toplevel1:
         self.ConnectButton.configure(highlightcolor="black")
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect to Existing Lobby''')
-        self.ConnectButton.configure(command=lambda: self.ConnectToLobby())
+        self.ConnectButton.configure(command=lambda: self.replaceGUI(connectGUI, self.top))
+        self.widgets.append(self.ConnectButton)
 
         self.CreateButton = tk.Button(self.LobbyFrame)
         self.CreateButton.place(relx=0.025, rely=0.508, height=134, width=377)
@@ -97,38 +103,14 @@ class Toplevel1:
         self.CreateButton.configure(highlightcolor="black")
         self.CreateButton.configure(pady="0")
         self.CreateButton.configure(text='''Create New Lobby''')
-        self.CreateButton.configure(command=lambda: self.CreateLobby())
-
-    def DeleteSelf(self):
-        # Remove Everything from the root
-        self.UserLabel.destroy()
-        self.LobbyFrame.destroy()
-        self.DisconnectButton.destroy()
-
-    def Disconnect(self):
-        self.DeleteSelf()
-        # Add the GUI from LobbyGUI
-        LoginGUI.Toplevel1(self.top)
-
-    def ConnectToLobby(self):
-        self.DeleteSelf()
-        # Add the GUI from connectGUI
-        connectGUI.Toplevel1(self.top)
-
-    def CreateLobby(self):
-        self.DeleteSelf()
-        # Add the GUI from LobbyCreationGUI
-        LobbyCreationGUI.Toplevel1(self.top)
+        self.CreateButton.configure(command=lambda: self.replaceGUI(LobbyCreationGUI, self.top))
+        self.widgets.append(self.CreateButton)
 
 
-#def start_up():
+# def start_up():
 #    LobbyGUI_support.main()
 
 if __name__ == '__main__':
     root = tk.Tk()
     t = Toplevel1(root)
     root.mainloop()
-
-
-
-

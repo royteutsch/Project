@@ -11,9 +11,12 @@ import tkinter.ttk as ttk
 from tkinter.constants import *
 
 # import connectGUI_support
+from GUI.BaselineGUI import GUI
 
-class Toplevel1:
+
+class Toplevel1(GUI):
     def __init__(self, top=None):
+        super(Toplevel1, self).__init__()
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -40,6 +43,7 @@ class Toplevel1:
         self.IDLabel.configure(font="-family {David} -size 20")
         self.IDLabel.configure(foreground="#000000")
         self.IDLabel.configure(text='''Lobby ID:''')
+        self.widgets.append(self.IDLabel)
 
         self.IDEntry = tk.Entry(self.top)
         self.IDEntry.place(relx=0.383, rely=0.289, height=40, relwidth=0.473)
@@ -48,6 +52,7 @@ class Toplevel1:
         self.IDEntry.configure(font="TkFixedFont")
         self.IDEntry.configure(foreground="#000000")
         self.IDEntry.configure(insertbackground="black")
+        self.widgets.append(self.IDEntry)
 
         self.ConnectButton = tk.Button(self.top)
         self.ConnectButton.place(relx=0.25, rely=0.556, height=94, width=307)
@@ -62,6 +67,7 @@ class Toplevel1:
         self.ConnectButton.configure(highlightcolor="black")
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect''')
+        self.widgets.append(self.ConnectButton)
 
 # def start_up():
 #    connectGUI_support.main()

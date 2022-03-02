@@ -13,9 +13,12 @@ from tkinter import *
 
 
 # import LoginGUI_support
+from GUI.BaselineGUI import GUI
 
-class Toplevel1:
+
+class Toplevel1(GUI):
     def __init__(self, top=None):
+        super(Toplevel1, self).__init__()
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -45,6 +48,7 @@ class Toplevel1:
         self.Title.configure(font="-family {David} -size 20")
         self.Title.configure(foreground="#000000")
         self.Title.configure(text='''Please connect to User''')
+        self.widgets.append(self.Title)
 
         self.LoginFrame = tk.Frame(self.top)
         self.LoginFrame.place(relx=0.2, rely=0.222, relheight=0.589
@@ -53,6 +57,7 @@ class Toplevel1:
         self.LoginFrame.configure(borderwidth="2")
         self.LoginFrame.configure(relief="groove")
         self.LoginFrame.configure(background="#d9d9d9")
+        self.widgets.append(self.LoginFrame)
 
         self.UsernameLabel = tk.Label(self.LoginFrame)
         self.UsernameLabel.place(relx=0.085, rely=0.038, height=69, width=114)
@@ -63,6 +68,7 @@ class Toplevel1:
         self.UsernameLabel.configure(font="-family {David} -size 18")
         self.UsernameLabel.configure(foreground="#000000")
         self.UsernameLabel.configure(text='''Username:''')
+        self.widgets.append(self.UsernameLabel)
 
         self.UsernameEntry = tk.Entry(self.LoginFrame)
         self.UsernameEntry.place(relx=0.423, rely=0.113, height=30
@@ -73,6 +79,7 @@ class Toplevel1:
         self.UsernameEntry.configure(foreground="#000000")
         self.UsernameEntry.configure(insertbackground="black")
         self.UsernameEntry.configure(textvariable=self.Username)
+        self.widgets.append(self.UsernameEntry)
 
         self.PasswordLabel = tk.Label(self.LoginFrame)
         self.PasswordLabel.place(relx=0.085, rely=0.34, height=71, width=114)
@@ -83,6 +90,7 @@ class Toplevel1:
         self.PasswordLabel.configure(font="-family {David} -size 18")
         self.PasswordLabel.configure(foreground="#000000")
         self.PasswordLabel.configure(text='''Password:''')
+        self.widgets.append(self.PasswordLabel)
 
         self.PasswordEntry = tk.Entry(self.LoginFrame)
         self.PasswordEntry.place(relx=0.423, rely=0.415, height=30
@@ -93,6 +101,7 @@ class Toplevel1:
         self.PasswordEntry.configure(foreground="#000000")
         self.PasswordEntry.configure(insertbackground="black")
         self.PasswordEntry.configure(textvariable=self.Password)
+        self.widgets.append(self.PasswordEntry)
 
         self.ConnectButton = tk.Button(self.LoginFrame)
         self.ConnectButton.place(relx=0.338, rely=0.717, height=64, width=117)
@@ -107,7 +116,8 @@ class Toplevel1:
         self.ConnectButton.configure(highlightcolor="black")
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect''')
-        self.ConnectButton.configure(command=lambda: self.ConnectToUser(self.Username, self.Password))
+        self.ConnectButton.configure(command=lambda: self.replaceGUI(LobbyGUI, self.top, [self.Username, self.Password]))
+        self.widgets.append(self.ConnectButton)
 
         self.CreateButton = tk.Button(self.top)
         self.CreateButton.place(relx=0.733, rely=0.911, height=34, width=147)
@@ -123,14 +133,7 @@ class Toplevel1:
         self.CreateButton.configure(pady="0")
         self.CreateButton.configure(text='''Create New User''')
         self.CreateButton.configure(command=lambda: webbrowser.open("www.google.com"))
-
-    def ConnectToUser(self, Username, Password):
-        # Remove Everything from the root
-        self.Title.destroy()
-        self.LoginFrame.destroy()
-        self.CreateButton.destroy()
-        # Add the GUI from LobbyGUI
-        LobbyGUI.Toplevel1(self.top, Username, Password)
+        self.widgets.append(self.CreateButton)
 
 
 # def start_up():

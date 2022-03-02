@@ -11,9 +11,12 @@ import tkinter.ttk as ttk
 from tkinter.constants import *
 
 # import LobbyCreationGUI_support
+from GUI.BaselineGUI import GUI
 
-class Toplevel1:
+
+class Toplevel1(GUI):
     def __init__(self, top=None):
+        super(Toplevel1, self).__init__()
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -49,6 +52,7 @@ class Toplevel1:
         self.LobbyNameLabel.configure(font="-family {David} -size 18")
         self.LobbyNameLabel.configure(foreground="#000000")
         self.LobbyNameLabel.configure(text='''Lobby Name:''')
+        self.widgets.append(self.LobbyNameLabel)
 
         self.LobbyNameEntry = tk.Entry(self.top)
         self.LobbyNameEntry.place(relx=0.483, rely=0.289, height=30
@@ -58,6 +62,7 @@ class Toplevel1:
         self.LobbyNameEntry.configure(font="TkFixedFont")
         self.LobbyNameEntry.configure(foreground="#000000")
         self.LobbyNameEntry.configure(insertbackground="black")
+        self.widgets.append(self.LobbyNameEntry)
 
         self.style.map('TCheckbutton',background=
             [('selected', _bgcolor), ('active', _ana2color)])
@@ -68,6 +73,7 @@ class Toplevel1:
         self.PrivateOrPublic.configure(takefocus="")
         self.PrivateOrPublic.configure(text='''Private''')
         self.PrivateOrPublic.configure(compound='left')
+        self.widgets.append(self.PrivateOrPublic)
 
         self.LobbyCreationButton = tk.Button(self.top)
         self.LobbyCreationButton.place(relx=0.333, rely=0.667, height=114
@@ -83,9 +89,8 @@ class Toplevel1:
         self.LobbyCreationButton.configure(highlightcolor="black")
         self.LobbyCreationButton.configure(pady="0")
         self.LobbyCreationButton.configure(text='''Create''')
+        self.widgets.append(self.LobbyCreationButton)
 
-#def start_up():
-#    LobbyCreationGUI_support.main()
 
 if __name__ == '__main__':
     root = tk.Tk()
