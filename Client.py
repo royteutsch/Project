@@ -1,26 +1,52 @@
+import hashlib
 import logging
 import select
 import socket
 
 logging.basicConfig(level=logging.DEBUG)
+ip = '127.0.0.1'
+port = 5555
 
-my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+class User:
+    def __init__(self, Username, Password):
+        self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.my_socket.connect((ip, port))
+        self.success = False  # Whether the User Connection was successful
+
+        # Encypt password for security purposes
+        hash_object = hashlib.md5(Password.encode())
+        md5_hash = hash_object.hexdigest()
+
+        self.my_socket.send(("C"+Username+"|"+md5_hash).encode())  # Inquires if the username and password are valid
+        print("Checking Client Info")
+        confirm = self.my_socket.recv(512).decode().lower()
+        print("Client Certificate received: " + confirm)
+        if confirm == "yes":
+            print("Client is Authentic")
+            self.Username = Username
+            self.Password = Password
+            self.success = True
+        print("Client Creation Successfull")
+        self.my_socket.close()
+
 
 
 class Lobby:
     def __init__(self, lobby_name):
         self.name = lobby_name
         self.data = []
-        my_socket.send("L")
-        self.id = my_socket.recv(512).decode()
+        self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.my_socket.connect((ip, port))
+        self.my_socket.send("L")
+        self.id = self.my_socket.recv(512).decode()
 
         # Setting up the mini server
-        SERVER_PORT = 5555
-        SERVER_IP = '0.0.0.0'
+        self.SERVER_PORT = 5555
+        self.SERVER_IP = '0.0.0.0'
 
         logging.debug("Setting up server...")
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind((SERVER_IP, SERVER_PORT))
+        self.server_socket.bind((self.SERVER_IP, self.SERVER_PORT))
         self.server_socket.listen()
         logging.info("Listening for clients...")
         self.client_sockets = []

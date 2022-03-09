@@ -7,6 +7,8 @@
 
 import sys
 import tkinter as tk
+
+import Client
 import LobbyGUI
 import webbrowser
 from tkinter import *
@@ -117,7 +119,7 @@ class Toplevel1(GUI):
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect''')
         # TODO: CHECK IF USER EXISTS IN DATABASE
-        self.ConnectButton.configure(command=lambda: self.replaceGUI(LobbyGUI, self.top, [self.Username, self.Password]))
+        self.ConnectButton.configure(command=lambda: self.connect_to_user(self.Username.get(), self.Password.get()))
         self.widgets.append(self.ConnectButton)
 
         self.CreateButton = tk.Button(self.top)
@@ -135,6 +137,16 @@ class Toplevel1(GUI):
         self.CreateButton.configure(text='''Create New User''')
         self.CreateButton.configure(command=lambda: webbrowser.open("www.google.com"))
         self.widgets.append(self.CreateButton)
+
+    def connect_to_user(self, Username, Password):
+        clientUser = Client.User(Username, Password)
+        print(clientUser.success)
+        if clientUser.success:  # If the Client was created successfully
+            print("Client Creation Successful, switching GUI")
+            self.replaceGUI(LobbyGUI, self.top, [self.Username, self.Password])
+        else:
+            # TODO: ADD POPUP ASKING FOR RETRY, CLEAN ENTRIES
+            pass
 
 
 # def start_up():

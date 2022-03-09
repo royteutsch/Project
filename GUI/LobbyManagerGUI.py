@@ -42,7 +42,7 @@ class Toplevel1(GUI):
         self.top = top
 
         self.LobbyName = tk.Label(self.top)
-        self.LobbyName.place(relx=0.025, rely=0.044, height=41, width=144)
+        self.LobbyName.place(relx=0.025, rely=0.044, height=41, width=600)
         self.LobbyName.configure(anchor='w')
         self.LobbyName.configure(background="#d9d9d9")
         self.LobbyName.configure(compound='left')
