@@ -103,6 +103,7 @@ class Toplevel1(GUI):
         self.PasswordEntry.configure(foreground="#000000")
         self.PasswordEntry.configure(insertbackground="black")
         self.PasswordEntry.configure(textvariable=self.Password)
+        self.PasswordEntry.configure(show='*')
         self.widgets.append(self.PasswordEntry)
 
         self.ConnectButton = tk.Button(self.LoginFrame)
@@ -118,7 +119,6 @@ class Toplevel1(GUI):
         self.ConnectButton.configure(highlightcolor="black")
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect''')
-        # TODO: CHECK IF USER EXISTS IN DATABASE
         self.ConnectButton.configure(command=lambda: self.connect_to_user(self.Username.get(), self.Password.get()))
         self.widgets.append(self.ConnectButton)
 
