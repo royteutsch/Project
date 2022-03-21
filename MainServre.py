@@ -58,12 +58,16 @@ class Server:
         client_infos = open("client_info.txt", "rb")
         client_database = pickle.load(client_infos)
         print("Client Database: " + str(client_database))
-        if client_database[cUsername] == cPassword:
-            print("Client exists")
-            client.send("yes".encode())
-        else:
+        if cUsername not in client_database:
             print("Client does not exist")
             client.send("no".encode())
+        else:
+            if client_database[cUsername] == cPassword:
+                print("Client exists")
+                client.send("yes".encode())
+            else:
+                print("Client does not exist")
+                client.send("no".encode())
 
     def client_messege(self, current_socket: socket.socket):
         command = current_socket.recv(1024).decode()  # get the request the client wants us to do
@@ -81,7 +85,7 @@ class Server:
             # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE), "F" (END OF LOBBY, GET THE ARCHIVE "F"ILE),
             # TODO: "C" ("C"HECK IF MEMBER EXISTS IN DATABASE)
             if directive == "L":  # A new lobby has just sent this, send back a unique id for it
-                current_socket.send(str(self.lobby_id).zfill(12))
+                current_socket.send(str(self.lobby_id).zfill(12).encode())
             if directive == "C":  # A client is trying to log in, check if He exists in the Database
                 params = command.split("|")
                 print("params: " + str(params))

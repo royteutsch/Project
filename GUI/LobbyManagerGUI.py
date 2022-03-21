@@ -11,6 +11,7 @@ import tkinter.ttk as ttk
 from tkinter.constants import *
 
 # import LobbyManagerGUI_support
+import Client
 from GUI.BaselineGUI import GUI
 
 
@@ -39,6 +40,12 @@ class Toplevel1(GUI):
         if params[1].get():
             self.SecStatus = "Private"
 
+        if params[0].get():
+            self.LobbyName = params[0].get()
+
+        if params is not None:
+            self.initiate_lobby(params[0].get(), params[1].get())
+
         self.top = top
 
         self.LobbyName = tk.Label(self.top)
@@ -52,16 +59,16 @@ class Toplevel1(GUI):
         self.LobbyName.configure(text='''Name: ''' + params[0].get())
         self.widgets.append(self.LobbyName)
 
-        self.LobbyID = tk.Label(self.top)
-        self.LobbyID.place(relx=0.309, rely=0.156, height=101, width=314)
-        self.LobbyID.configure(anchor='w')
-        self.LobbyID.configure(background="#d9d9d9")
-        self.LobbyID.configure(compound='left')
-        self.LobbyID.configure(disabledforeground="#a3a3a3")
-        self.LobbyID.configure(font="-family {David} -size 30")
-        self.LobbyID.configure(foreground="#000000")
-        self.LobbyID.configure(text='''ID:''')
-        self.widgets.append(self.LobbyID)
+        self.lobbyIDLabel = tk.Label(self.top)
+        self.lobbyIDLabel.place(relx=0.309, rely=0.156, height=101, width=314)
+        self.lobbyIDLabel.configure(anchor='w')
+        self.lobbyIDLabel.configure(background="#d9d9d9")
+        self.lobbyIDLabel.configure(compound='left')
+        self.lobbyIDLabel.configure(disabledforeground="#a3a3a3")
+        self.lobbyIDLabel.configure(font="-family {David} -size 30")
+        self.lobbyIDLabel.configure(foreground="#000000")
+        self.lobbyIDLabel.configure(text='''ID:''' + self.lobby.id)
+        self.widgets.append(self.lobbyIDLabel)
 
         self.SecLabel = tk.Label(self.top)
         self.SecLabel.place(relx=0.73, rely=0.044, height=41, width=203)
@@ -141,6 +148,10 @@ class Toplevel1(GUI):
         self.StartSessionButton.configure(pady="0")
         self.StartSessionButton.configure(text='''Start Session''')
         self.widgets.append(self.StartSessionButton)
+
+    def initiate_lobby(self, lobby_name, lobby_security):
+        self.lobby = Client.Lobby(lobby_name=lobby_name, priv_or_publ=lobby_security)
+
 
 # def start_up():
 #     LobbyManagerGUI_support.main()

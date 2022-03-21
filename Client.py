@@ -2,10 +2,12 @@ import hashlib
 import logging
 import select
 import socket
+import threading
 
 logging.basicConfig(level=logging.DEBUG)
 ip = '127.0.0.1'
 port = 5555
+
 
 class User:
     def __init__(self, Username, Password):
@@ -17,7 +19,8 @@ class User:
         hash_object = hashlib.md5(Password.encode())
         md5_hash = hash_object.hexdigest()
 
-        self.my_socket.send(("C"+Username+"|"+md5_hash).encode())  # Inquires if the username and password are valid
+        self.my_socket.send(
+            ("C" + Username + "|" + md5_hash).encode())  # Inquires if the username and password are valid
         print("Checking Client Info")
         confirm = self.my_socket.recv(512).decode().lower()
         print("Client Certificate received: " + confirm)
@@ -30,18 +33,19 @@ class User:
         self.my_socket.close()
 
 
-
 class Lobby:
-    def __init__(self, lobby_name):
+    def __init__(self, lobby_name, priv_or_publ):
         self.name = lobby_name
+        self.security_status = priv_or_publ
         self.data = []
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect((ip, port))
-        self.my_socket.send("L")
+        self.my_socket.send("L".encode())
         self.id = self.my_socket.recv(512).decode()
 
+        print("Finished making lobby credentials")
         # Setting up the mini server
-        self.SERVER_PORT = 5555
+        self.SERVER_PORT = 5556
         self.SERVER_IP = '0.0.0.0'
 
         logging.debug("Setting up server...")
@@ -51,7 +55,8 @@ class Lobby:
         logging.info("Listening for clients...")
         self.client_sockets = []
         self.messages_to_send = []
-        self.main_loop()
+        t = threading.Thread(target=self.main_loop())
+        t.start()
 
     def print_client_sockets(self, client_sockets):
         for i in range(len(client_sockets)):
@@ -69,13 +74,14 @@ class Lobby:
 
     def main_loop(self):
         while True:
+            print("main looping")
             rlist, wlist, xlist = select.select([self.server_socket] + self.client_sockets, self.client_sockets, [])
             for current_socket in rlist:
                 if current_socket is self.server_socket:  # new client joins
                     self.newclient(current_socket, self.client_sockets)  # create new client
                 else:  # what to do with new client
                     self.client_messege(current_socket)
-
+            # TODO: FIX
             for message in self.messages_to_send:
                 current_socket, data = message
                 if current_socket in wlist:

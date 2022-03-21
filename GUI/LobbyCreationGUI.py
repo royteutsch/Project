@@ -97,7 +97,6 @@ class Toplevel1(GUI):
                                                                            [self.lobbyName, self.lobbySec]))
         self.widgets.append(self.LobbyCreationButton)
 
-
 if __name__ == '__main__':
     root = tk.Tk()
     t = Toplevel1(root)
