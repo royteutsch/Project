@@ -9,7 +9,7 @@ class Server:
     def __init__(self):
         self.SERVER_PORT = 5555
         self.SERVER_IP = '0.0.0.0'
-
+        self.socket_address_map = {}
         logging.basicConfig(level=logging.DEBUG)
 
         logging.debug("Setting up server...")
@@ -18,6 +18,7 @@ class Server:
         server_socket.listen()
         logging.info("Listening for clients...")
         self.client_sockets = []
+        self.active_lobbies = {}  # The dict is structured as {lobby ID : lobby IP}
         messages_to_send = []
         # place for parameters
 
@@ -46,6 +47,9 @@ class Server:
 
     def newclient(self, current_socket, client_sockets):
         connection, client_address = current_socket.accept()
+
+        self.socket_address_map[connection] = client_address
+
         logging.info("New client joined!")
         client_sockets.append(connection)
         self.print_client_sockets(client_sockets)
@@ -83,15 +87,23 @@ class Server:
             command = command[1:]
             print("command: " + command)
             # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE), "F" (END OF LOBBY, GET THE ARCHIVE "F"ILE),
-            # TODO: "C" ("C"HECK IF MEMBER EXISTS IN DATABASE)
+            # TODO: "I" (A USER WANTS TO CONNECT TO A LOBBY, NOTIFY THE LOBBY, IF IT EXISTS, CHECK THROUGH LOBBY "I"D)
             if directive == "L":  # A new lobby has just sent this, send back a unique id for it
                 current_socket.send(str(self.lobby_id).zfill(12).encode())
+                socket_address = self.socket_address_map[current_socket]
+                print(socket_address)
+                self.active_lobbies[str(self.lobby_id).zfill(12)] = socket_address[0]
+                self.lobby_id += 1
             if directive == "C":  # A client is trying to log in, check if He exists in the Database
                 params = command.split("|")
                 print("params: " + str(params))
                 print("Checking client info")
                 self.check_client_info(params, current_socket)
-
+            if directive == "I":  # Check if the lobby exists, if it does, send the ip address. If not, send "-1"
+                if command in self.active_lobbies:
+                    current_socket.send(self.active_lobbies[command].encode())
+                else:
+                    current_socket.send("-1".encode())
 
 def main():
     server = Server()

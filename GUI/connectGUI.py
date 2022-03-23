@@ -9,14 +9,17 @@ import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
+import LobbyWaitGUI
 
 # import connectGUI_support
 from GUI.BaselineGUI import GUI
 
 
 class Toplevel1(GUI):
-    def __init__(self, top=None):
+    def __init__(self, top=None, params=None):
         super(Toplevel1, self).__init__()
+        if params is None:
+            params = []
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -28,11 +31,16 @@ class Toplevel1(GUI):
         top.geometry("600x450+660+210")
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
-        top.resizable(1,  1)
+        top.resizable(0,  0)
         top.title("Toplevel 0")
         top.configure(background="#d9d9d9")
 
         self.top = top
+
+        self.ID = tk.IntVar()
+
+        if params[0]:
+            self.Client = params[0]
 
         self.IDLabel = tk.Label(self.top)
         self.IDLabel.place(relx=0.183, rely=0.289, height=41, width=144)
@@ -45,6 +53,8 @@ class Toplevel1(GUI):
         self.IDLabel.configure(text='''Lobby ID:''')
         self.widgets.append(self.IDLabel)
 
+        # TODO: ADD POPUP WHEN NO LOBBY EXISTS
+
         self.IDEntry = tk.Entry(self.top)
         self.IDEntry.place(relx=0.383, rely=0.289, height=40, relwidth=0.473)
         self.IDEntry.configure(background="white")
@@ -52,6 +62,7 @@ class Toplevel1(GUI):
         self.IDEntry.configure(font="TkFixedFont")
         self.IDEntry.configure(foreground="#000000")
         self.IDEntry.configure(insertbackground="black")
+        self.IDEntry.configure(textvariable=self.ID)
         self.widgets.append(self.IDEntry)
 
         self.ConnectButton = tk.Button(self.top)
@@ -67,7 +78,20 @@ class Toplevel1(GUI):
         self.ConnectButton.configure(highlightcolor="black")
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect''')
+        self.ConnectButton.configure(command=lambda: self.connect_to_lobby())
         self.widgets.append(self.ConnectButton)
+
+    def connect_to_lobby(self):
+        connection_succesful = self.Client.inquire_lobby(self.ID)
+        if connection_succesful:
+            self.replaceGUI(LobbyWaitGUI, self.top)
+        else:
+            t = tk.Toplevel(self.top)
+            t.geometry("232x191+660+210")
+            t.title("Popup")
+            t.resizable(0, 0)
+            tk.Label(t, text="Invalid lobby!", font=('-family {David} -size 20 -weight bold')).place(x=40, y=80)
+            pass
 
 # def start_up():
 #    connectGUI_support.main()

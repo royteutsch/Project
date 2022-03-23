@@ -14,7 +14,7 @@ from GUI.BaselineGUI import GUI
 
 
 class Toplevel1(GUI):
-    def __init__(self, top=None):
+    def __init__(self, top=None, params=None):
         super(Toplevel1, self).__init__()
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
@@ -44,6 +44,7 @@ class Toplevel1(GUI):
 
         self.lobbyName  = tk.StringVar()
         self.lobbySec = tk.IntVar()
+        self.Client = params[0]
 
         self.LobbyNameLabel = tk.Label(self.top)
         self.LobbyNameLabel.place(relx=0.217, rely=0.267, height=51, width=154)
@@ -94,7 +95,7 @@ class Toplevel1(GUI):
         self.LobbyCreationButton.configure(pady="0")
         self.LobbyCreationButton.configure(text='''Create''')
         self.LobbyCreationButton.configure(command=lambda: self.replaceGUI(LobbyManagerGUI, self.top,
-                                                                           [self.lobbyName, self.lobbySec]))
+                                                                           [self.lobbyName, self.lobbySec, self.Client]))
         self.widgets.append(self.LobbyCreationButton)
 
 if __name__ == '__main__':

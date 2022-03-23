@@ -37,16 +37,20 @@ class Toplevel1(GUI):
 
         self.SecStatus = "Public"
 
+        if params[2]:
+            self.client = params[2]
+
         if params[1].get():
             self.SecStatus = "Private"
 
         if params[0].get():
             self.LobbyName = params[0].get()
 
-        if params is not None:
-            self.initiate_lobby(params[0].get(), params[1].get())
-
         self.top = top
+
+        if params is not None:
+            print("Initiating Lobby")
+            self.top.after(100, self.initiate_lobby(params[0].get(), params[1].get()))
 
         self.LobbyName = tk.Label(self.top)
         self.LobbyName.place(relx=0.025, rely=0.044, height=41, width=600)
@@ -135,7 +139,7 @@ class Toplevel1(GUI):
 
         self.StartSessionButton = tk.Button(self.top)
         self.StartSessionButton.place(relx=0.347, rely=0.689, height=114
-                , width=497)
+                                      , width=497)
         self.StartSessionButton.configure(activebackground="#ececec")
         self.StartSessionButton.configure(activeforeground="#000000")
         self.StartSessionButton.configure(background="#d9d9d9")
@@ -151,7 +155,12 @@ class Toplevel1(GUI):
 
     def initiate_lobby(self, lobby_name, lobby_security):
         self.lobby = Client.Lobby(lobby_name=lobby_name, priv_or_publ=lobby_security)
+        self.top.after(1000, self.run_lobby_loop)
 
+    def run_lobby_loop(self):
+        self.lobby.one_loop()
+        print("looping on lobby")
+        self.top.after(1000, self.run_lobby_loop)
 
 # def start_up():
 #     LobbyManagerGUI_support.main()

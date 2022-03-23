@@ -143,9 +143,13 @@ class Toplevel1(GUI):
         print(clientUser.success)
         if clientUser.success:  # If the Client was created successfully
             print("Client Creation Successful, switching GUI")
-            self.replaceGUI(LobbyGUI, self.top, [self.Username, self.Password])
+            self.replaceGUI(LobbyGUI, self.top, [self.Username, self.Password, clientUser])
         else:
-            # TODO: ADD POPUP ASKING FOR RETRY, CLEAN ENTRIES
+            t = Toplevel(self.top)
+            t.geometry("232x191+660+210")
+            t.title("Popup")
+            t.resizable(0,  0)
+            Label(t, text="Invalid user!", font=('-family {David} -size 20 -weight bold')).place(x=40, y=80)
             pass
 
 

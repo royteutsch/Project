@@ -38,6 +38,7 @@ class Toplevel1(GUI):
 
         self.Username = params[0].get()
         self.Password = params[1].get()
+        self.Client = params[2]
 
         self.UserLabel = tk.Label(self.top)
         self.UserLabel.place(relx=0.017, rely=0.022, height=31, width=584)
@@ -89,7 +90,7 @@ class Toplevel1(GUI):
         self.ConnectButton.configure(highlightcolor="black")
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect to Existing Lobby''')
-        self.ConnectButton.configure(command=lambda: self.replaceGUI(connectGUI, self.top))
+        self.ConnectButton.configure(command=lambda: self.replaceGUI(connectGUI, self.top, [self.Client]))
         self.widgets.append(self.ConnectButton)
 
         self.CreateButton = tk.Button(self.LobbyFrame)
@@ -105,7 +106,7 @@ class Toplevel1(GUI):
         self.CreateButton.configure(highlightcolor="black")
         self.CreateButton.configure(pady="0")
         self.CreateButton.configure(text='''Create New Lobby''')
-        self.CreateButton.configure(command=lambda: self.replaceGUI(LobbyCreationGUI, self.top))
+        self.CreateButton.configure(command=lambda: self.replaceGUI(LobbyCreationGUI, self.top, [self.Client]))
         self.widgets.append(self.CreateButton)
 
 

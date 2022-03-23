@@ -2,7 +2,6 @@ import hashlib
 import logging
 import select
 import socket
-import threading
 
 logging.basicConfig(level=logging.DEBUG)
 ip = '127.0.0.1'
@@ -32,11 +31,28 @@ class User:
         print("Client Creation Successfull")
         self.my_socket.close()
 
+    def inquire_lobby(self, lobby_id):
+        # Ask the main server if The lobby exists, and if it does, connect to it
+        self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.my_socket.connect((ip, port))
+        self.my_socket.send(("I"+str(lobby_id)).encode())
+        print("Checking if lobby exists")
+        lobby_ip = str(self.my_socket.recv(1024).decode())
+        print(lobby_ip)
+        print(type(lobby_ip))
+        self.my_socket.close()
+        if lobby_ip is not str(-1):
+            self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.my_socket.connect((lobby_ip, 5556))
+            return True
+        else:
+            return False
 
 class Lobby:
     def __init__(self, lobby_name, priv_or_publ):
         self.name = lobby_name
         self.security_status = priv_or_publ
+        self.users = []
         self.data = []
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect((ip, port))
@@ -55,8 +71,6 @@ class Lobby:
         logging.info("Listening for clients...")
         self.client_sockets = []
         self.messages_to_send = []
-        t = threading.Thread(target=self.main_loop())
-        t.start()
 
     def print_client_sockets(self, client_sockets):
         for i in range(len(client_sockets)):
@@ -72,18 +86,18 @@ class Lobby:
         pass
         # TODO: ADD RECEIVING DRAWINGS AND ADDING TO DATA USING PROCEDURE FOR LONG MESSAGE RECEIVES
 
-    def main_loop(self):
-        while True:
-            print("main looping")
-            rlist, wlist, xlist = select.select([self.server_socket] + self.client_sockets, self.client_sockets, [])
-            for current_socket in rlist:
-                if current_socket is self.server_socket:  # new client joins
-                    self.newclient(current_socket, self.client_sockets)  # create new client
-                else:  # what to do with new client
-                    self.client_messege(current_socket)
-            # TODO: FIX
-            for message in self.messages_to_send:
-                current_socket, data = message
-                if current_socket in wlist:
-                    current_socket.send(data.encode())
-                    self.messages_to_send.remove(message)
+    def one_loop(self):
+        print("main looping")
+        rlist, wlist, xlist = select.select([self.server_socket] + self.client_sockets, [], [], 0.1)
+        print("rlist acquired")
+        for current_socket in rlist:
+            if current_socket is self.server_socket:  # new client joins
+                self.newclient(current_socket, self.client_sockets)  # create new client
+            else:  # what to do with new client
+                self.client_messege(current_socket)
+        print("responding to clients")
+        for message in self.messages_to_send:
+            current_socket, data = message
+            if current_socket in wlist:
+                current_socket.send(data.encode())
+                self.messages_to_send.remove(message)
