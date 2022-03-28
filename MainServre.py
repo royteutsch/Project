@@ -100,6 +100,8 @@ class Server:
                 print("Checking client info")
                 self.check_client_info(params, current_socket)
             if directive == "I":  # Check if the lobby exists, if it does, send the ip address. If not, send "-1"
+                print(command)
+                print(self.active_lobbies)
                 if command in self.active_lobbies:
                     current_socket.send(self.active_lobbies[command].encode())
                 else:

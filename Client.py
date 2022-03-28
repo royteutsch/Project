@@ -40,8 +40,9 @@ class User:
         lobby_ip = str(self.my_socket.recv(1024).decode())
         print(lobby_ip)
         print(type(lobby_ip))
+        print(lobby_ip is not str(-1))
         self.my_socket.close()
-        if lobby_ip is not str(-1):
+        if lobby_ip != str(-1):
             self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.my_socket.connect((lobby_ip, 5556))
             return True
