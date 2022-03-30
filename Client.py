@@ -45,6 +45,8 @@ class User:
         if lobby_ip != str(-1):
             self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.my_socket.connect((lobby_ip, 5556))
+            self.my_socket.send(("U" + self.Username).encode())
+            print("Username sent to server")
             return True
         else:
             return False
@@ -55,6 +57,7 @@ class Lobby:
         self.security_status = priv_or_publ
         self.users = []
         self.data = []
+        self.rlist = []
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect((ip, port))
         self.my_socket.send("L".encode())
@@ -72,26 +75,48 @@ class Lobby:
         logging.info("Listening for clients...")
         self.client_sockets = []
         self.messages_to_send = []
+        self.connected_users = {}
+        self.socket_address_map = {}
 
     def print_client_sockets(self, client_sockets):
         for i in range(len(client_sockets)):
             logging.debug(client_sockets[i])
 
     def newclient(self, current_socket, client_sockets):
-        connection, client_address = current_socket.accept()
-        logging.info("New client joined!")
-        client_sockets.append(connection)
-        self.print_client_sockets(client_sockets)
+        if not self.security_status:
+            connection, client_address = current_socket.accept()
+
+            self.socket_address_map[connection] = client_address
+
+            logging.info("New client joined!")
+            client_sockets.append(connection)
+            self.print_client_sockets(client_sockets)
+        else:  # Make a popup for asking
+            self.popupList.append()
 
     def client_messege(self, current_socket: socket.socket):
-        pass
-        # TODO: ADD RECEIVING DRAWINGS AND ADDING TO DATA USING PROCEDURE FOR LONG MESSAGE RECEIVES
+        data = current_socket.recv(1024).decode()
+        print("Data: " + data)
+        print("Sender: " + str(current_socket))
+        if data == "":
+            """print("Connection closed with client")
+            self.client_sockets.remove(current_socket)
+            self.rlist.remove(current_socket)
+            current_socket.close()"""
+        else:
+            command = data[0]
+            params = data[1:]
+            if command == "U":  # A new client has sent us their "U"sername
+                socket_address = self.socket_address_map[current_socket]
+                self.connected_users[params] = socket_address[0]
+                print("User " + params + " Added to user list")
+            # TODO: ADD RECEIVING DRAWINGS AND ADDING TO DATA USING PROCEDURE FOR LONG MESSAGE RECEIVES
 
     def one_loop(self):
         print("main looping")
-        rlist, wlist, xlist = select.select([self.server_socket] + self.client_sockets, [], [], 0.1)
+        self.rlist, wlist, xlist = select.select([self.server_socket] + self.client_sockets, [], [], 0.1)
         print("rlist acquired")
-        for current_socket in rlist:
+        for current_socket in self.rlist:
             if current_socket is self.server_socket:  # new client joins
                 self.newclient(current_socket, self.client_sockets)  # create new client
             else:  # what to do with new client

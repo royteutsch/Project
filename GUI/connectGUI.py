@@ -53,8 +53,6 @@ class Toplevel1(GUI):
         self.IDLabel.configure(text='''Lobby ID:''')
         self.widgets.append(self.IDLabel)
 
-        # TODO: ADD POPUP WHEN NO LOBBY EXISTS
-
         self.IDEntry = tk.Entry(self.top)
         self.IDEntry.place(relx=0.383, rely=0.289, height=40, relwidth=0.473)
         self.IDEntry.configure(background="white")
@@ -84,7 +82,7 @@ class Toplevel1(GUI):
     def connect_to_lobby(self):
         connection_succesful = self.Client.inquire_lobby(str(self.ID.get()).zfill(12))
         if connection_succesful:
-            self.replaceGUI(LobbyWaitGUI, self.top)
+            self.replaceGUI(LobbyWaitGUI, self.top, [self.Client, self.ID.get()])
         else:
             t = tk.Toplevel(self.top)
             t.geometry("232x191+660+210")

@@ -11,9 +11,14 @@ import tkinter.ttk as ttk
 from tkinter.constants import *
 
 # import LobbyWaitGUI_support
+from GUI.BaselineGUI import GUI
 
-class Toplevel1:
-    def __init__(self, top=None):
+
+class Toplevel1(GUI):
+    def __init__(self, top=None, params=None):
+        super(Toplevel1, self).__init__()
+        if params is None:
+            params = []
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -30,6 +35,12 @@ class Toplevel1:
         top.configure(background="#d9d9d9")
 
         self.top = top
+
+        if params[0]:
+            self.Client = params[0]
+            # self.ID = params[1]
+
+        # self.Client.inquire_lobby(str(self.ID).zfill(12))
 
         self.Label1 = tk.Label(self.top)
         self.Label1.place(relx=0.25, rely=0.2, height=71, width=284)

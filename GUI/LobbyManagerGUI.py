@@ -36,6 +36,9 @@ class Toplevel1(GUI):
         top.configure(background="#d9d9d9")
 
         self.SecStatus = "Public"
+        self.users = []
+        self.users_string = ""
+        self.user_list_text_variable = tk.StringVar()
 
         if params[2]:
             self.client = params[2]
@@ -93,7 +96,7 @@ class Toplevel1(GUI):
         self.UserListLabel.configure(disabledforeground="#a3a3a3")
         self.UserListLabel.configure(font="-family {David} -size 18")
         self.UserListLabel.configure(foreground="#000000")
-        self.UserListLabel.configure(text='''Connected:''')
+        self.UserListLabel.configure(textvariable=self.user_list_text_variable)
         self.widgets.append(self.UserListLabel)
 
         self.SeeAll = tk.Button(self.top)
@@ -161,6 +164,17 @@ class Toplevel1(GUI):
         self.lobby.one_loop()
         print("looping on lobby")
         self.top.after(1000, self.run_lobby_loop)
+        # Update the user list
+        self.users = self.lobby.connected_users.keys()
+        self.update_users_string()
+
+    def update_users_string(self):
+        ret = ""
+        for user in self.users:
+            ret += str(user) + " ,"
+        self.users_string = ret[:-1]
+        self.user_list_text_variable.set('''Connected: ''' + self.users_string)
+
 
 # def start_up():
 #     LobbyManagerGUI_support.main()
