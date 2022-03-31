@@ -86,8 +86,7 @@ class Server:
             print("directive: " + directive)
             command = command[1:]
             print("command: " + command)
-            # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE), "F" (END OF LOBBY, GET THE ARCHIVE "F"ILE),
-            # TODO: "I" (A USER WANTS TO CONNECT TO A LOBBY, NOTIFY THE LOBBY, IF IT EXISTS, CHECK THROUGH LOBBY "I"D)
+            # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE), "F" (END OF LOBBY, GET THE ARCHIVE "F"ILE)
             if directive == "L":  # A new lobby has just sent this, send back a unique id for it
                 current_socket.send(str(self.lobby_id).zfill(12).encode())
                 socket_address = self.socket_address_map[current_socket]
@@ -100,6 +99,7 @@ class Server:
                 print("Checking client info")
                 self.check_client_info(params, current_socket)
             if directive == "I":  # Check if the lobby exists, if it does, send the ip address. If not, send "-1"
+
                 print(command)
                 print(self.active_lobbies)
                 if command in self.active_lobbies:

@@ -50,7 +50,7 @@ class Toplevel1(GUI):
         self.Label1.configure(disabledforeground="#a3a3a3")
         self.Label1.configure(font="-family {David} -size 20")
         self.Label1.configure(foreground="#000000")
-        self.Label1.configure(text='''Connecting To:''')
+        self.Label1.configure(text='''Connecting''')
 
         self.Label2 = tk.Label(self.top)
         self.Label2.place(relx=0.333, rely=0.489, height=91, width=174)

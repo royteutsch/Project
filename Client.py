@@ -3,6 +3,9 @@ import logging
 import select
 import socket
 
+import GUI.UserPromptGUI
+import tkinter as tk
+
 logging.basicConfig(level=logging.DEBUG)
 ip = '127.0.0.1'
 port = 5555
@@ -35,7 +38,7 @@ class User:
         # Ask the main server if The lobby exists, and if it does, connect to it
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect((ip, port))
-        self.my_socket.send(("I"+str(lobby_id)).encode())
+        self.my_socket.send(("I" + str(lobby_id)).encode())
         print("Checking if lobby exists")
         lobby_ip = str(self.my_socket.recv(1024).decode())
         print(lobby_ip)
@@ -46,10 +49,15 @@ class User:
             self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.my_socket.connect((lobby_ip, 5556))
             self.my_socket.send(("U" + self.Username).encode())
+            confirmation = self.my_socket.recv(1024).decode()
             print("Username sent to server")
-            return True
+            if confirmation == "yes":
+                return True
+            else:
+                return False
         else:
             return False
+
 
 class Lobby:
     def __init__(self, lobby_name, priv_or_publ):
@@ -78,11 +86,13 @@ class Lobby:
         self.connected_users = {}
         self.socket_address_map = {}
 
+
+
     def print_client_sockets(self, client_sockets):
         for i in range(len(client_sockets)):
             logging.debug(client_sockets[i])
 
-    def newclient(self, current_socket, client_sockets):
+    def newclient(self, current_socket: socket.socket, client_sockets):
         if not self.security_status:
             connection, client_address = current_socket.accept()
 
@@ -92,17 +102,19 @@ class Lobby:
             client_sockets.append(connection)
             self.print_client_sockets(client_sockets)
         else:  # Make a popup for asking
-            self.popupList.append()
+            connection, client_address = current_socket.accept()
+            client_username = connection.recv(1024).decode()[1:]
+            self.confirmationPopup(client_username, connection, client_address)
 
     def client_messege(self, current_socket: socket.socket):
         data = current_socket.recv(1024).decode()
         print("Data: " + data)
         print("Sender: " + str(current_socket))
         if data == "":
-            """print("Connection closed with client")
+            print("Connection closed with client")
             self.client_sockets.remove(current_socket)
             self.rlist.remove(current_socket)
-            current_socket.close()"""
+            current_socket.close()
         else:
             command = data[0]
             params = data[1:]
@@ -111,6 +123,29 @@ class Lobby:
                 self.connected_users[params] = socket_address[0]
                 print("User " + params + " Added to user list")
             # TODO: ADD RECEIVING DRAWINGS AND ADDING TO DATA USING PROCEDURE FOR LONG MESSAGE RECEIVES
+
+    def check_popup(self, t, current_socket, root, connection_address):
+        if t.confirm == 0:  # Lobby manager did not allow the user to join
+            current_socket.send("no".encode())
+            root.destroy()
+            current_socket.close()
+        elif t.confirm == 1:  # Lobby manager allowed the user to join
+            current_socket.send("yes".encode())
+            self.socket_address_map[current_socket] = connection_address
+            logging.info("New Client Joined!")
+            self.client_sockets.append(current_socket)
+            self.print_client_sockets(self.client_sockets)
+            socket_address = self.socket_address_map[current_socket]
+            self.connected_users[t.username] = socket_address[0]
+            print("User " + t.username + " Added to user list")
+            root.destroy()
+        else:
+            root.after(100, lambda: self.check_popup(t, current_socket, root, connection_address))
+
+    def confirmationPopup(self, username, current_socket: socket.socket, connection_address):
+        root = tk.Tk()
+        t = GUI.UserPromptGUI.Toplevel1(username=username, top=root)
+        root.after(100, lambda: self.check_popup(t, current_socket, root, connection_address))
 
     def one_loop(self):
         print("main looping")

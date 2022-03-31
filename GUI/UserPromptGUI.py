@@ -13,7 +13,7 @@ from tkinter.constants import *
 #import UserPromptGUI_support
 
 class Toplevel1:
-    def __init__(self, top=None):
+    def __init__(self, username, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -30,6 +30,8 @@ class Toplevel1:
         top.configure(background="#d9d9d9")
 
         self.top = top
+        self.username = username
+        self.confirm = 3
 
         self.NameLabel = tk.Label(self.top)
         self.NameLabel.place(relx=0.295, rely=0.0, height=61, width=144)
@@ -39,7 +41,7 @@ class Toplevel1:
         self.NameLabel.configure(disabledforeground="#a3a3a3")
         self.NameLabel.configure(font="-family {David} -size 18")
         self.NameLabel.configure(foreground="#000000")
-        self.NameLabel.configure(text='''Label''')
+        self.NameLabel.configure(text=self.username)
 
         self.PromptLabel = tk.Label(self.top)
         self.PromptLabel.place(relx=0.177, rely=0.25, height=51, width=224)
@@ -64,6 +66,7 @@ class Toplevel1:
         self.YesButton.configure(highlightcolor="black")
         self.YesButton.configure(pady="0")
         self.YesButton.configure(text='''Yes''')
+        self.YesButton.configure(command=lambda: self.Yes())
 
         self.NoButton = tk.Button(self.top)
         self.NoButton.place(relx=0.531, rely=0.625, height=64, width=117)
@@ -78,6 +81,14 @@ class Toplevel1:
         self.NoButton.configure(highlightcolor="black")
         self.NoButton.configure(pady="0")
         self.NoButton.configure(text='''No''')
+        self.NoButton.configure(command=lambda: self.No())
+
+    def Yes(self):
+        self.confirm = 1
+
+    def No(self):
+        self.confirm = 0
+
 
 #def start_up():
 #    UserPromptGUI_support.main()
