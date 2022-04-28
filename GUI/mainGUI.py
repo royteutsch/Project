@@ -15,7 +15,10 @@ from tkinter.constants import *
 
 
 class Toplevel1:
-    def __init__(self, top=None):
+    def __init__(self, top=None, params=None):
+        super(Toplevel1, self).__init__()
+        if params is None:
+            params = []
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -33,6 +36,10 @@ class Toplevel1:
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
 
+        if params[0]:
+            self.net = params[0]  # Either a lobby or a client
+        if params[1]:
+            self.status = params[1]  # Whether we are a lobby or a client
 
         self.top = top
 
@@ -47,6 +54,7 @@ class Toplevel1:
         self.Canvas.configure(relief="ridge")
         self.Canvas.configure(selectbackground="blue")
         self.Canvas.configure(selectforeground="white")
+        # self.Canvas.bind('<Button-1>', self.draw())
 
         self.FilterFrame = tk.Frame(self.top)
         self.FilterFrame.place(relx=0.825, rely=0.019, relheight=0.951
@@ -325,6 +333,11 @@ class Toplevel1:
         _img5 = tk.PhotoImage(file=photo_location)
         self.ParamButton.configure(image=_img5)
         self.ParamButton.configure(pady="0")
+
+        #self.update()
+
+    """def update(self):
+        self.Canvas."""
 
 # def start_up():
 #     mainGUI_support.main()

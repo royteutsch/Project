@@ -12,6 +12,7 @@ from tkinter.constants import *
 
 # import LobbyManagerGUI_support
 import Client
+from GUI import mainGUI
 from GUI.BaselineGUI import GUI
 
 
@@ -154,6 +155,7 @@ class Toplevel1(GUI):
         self.StartSessionButton.configure(highlightcolor="black")
         self.StartSessionButton.configure(pady="0")
         self.StartSessionButton.configure(text='''Start Session''')
+        self.StartSessionButton.configure(command=lambda: self.start_drawing())
         self.widgets.append(self.StartSessionButton)
 
     def initiate_lobby(self, lobby_name, lobby_security):
@@ -175,6 +177,9 @@ class Toplevel1(GUI):
         self.users_string = ret[:-1]
         self.user_list_text_variable.set('''Connected: ''' + self.users_string)
 
+    def start_drawing(self):
+        self.lobby.send_to_everyone("D")
+        self.replaceGUI(mainGUI, self.top, [self.lobby, "l"])
 
 # def start_up():
 #     LobbyManagerGUI_support.main()

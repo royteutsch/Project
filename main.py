@@ -21,22 +21,22 @@ def check_client_info(params):
         print("no")
 
 
-def print_hi():
+def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
-    hash_object = hashlib.md5("123".encode())
+    text = "123"
+    hash_object = hashlib.md5(text.encode())
     md5_hash = hash_object.hexdigest()
 
-    dict = {"J":md5_hash,
-            "g":hashlib.md5("r".encode()).hexdigest()}
+    dict = {"J":md5_hash}
     file = open("client_info.txt", "wb")
     pickle.dump(dict, file)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    """Username = "J"
+    Username = "J"
     Password = "123"
     hash_object = hashlib.md5(Password.encode())
     md5_hash = hash_object.hexdigest()
-    check_client_info([Username, md5_hash])"""
-    print_hi()
+    check_client_info([Username, md5_hash])
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

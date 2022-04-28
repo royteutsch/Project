@@ -16,6 +16,7 @@ class User:
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect((ip, port))
         self.success = False  # Whether the User Connection was successful
+        self.drawing = 0  # Whether or not we are in drawing mode
 
         # Encypt password for security purposes
         hash_object = hashlib.md5(Password.encode())
@@ -58,6 +59,11 @@ class User:
         else:
             return False
 
+    def wait_for_lobby(self):
+        # Requires Connection to Lobby. Waits until lobby sends "D" for drawing and changes to drawing mode
+        confirmation = self.my_socket.recv(1024).decode()
+        if confirmation == "D":
+            self.drawing = 1
 
 class Lobby:
     def __init__(self, lobby_name, priv_or_publ):
@@ -85,8 +91,6 @@ class Lobby:
         self.messages_to_send = []
         self.connected_users = {}
         self.socket_address_map = {}
-
-
 
     def print_client_sockets(self, client_sockets):
         for i in range(len(client_sockets)):
@@ -162,3 +166,7 @@ class Lobby:
             if current_socket in wlist:
                 current_socket.send(data.encode())
                 self.messages_to_send.remove(message)
+
+    def send_to_everyone(self, message: str):
+        for current_socket in self.client_sockets:
+            current_socket.send(message.encode())
