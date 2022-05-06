@@ -101,7 +101,7 @@ class Lobby:
             connection, client_address = current_socket.accept()
 
             self.socket_address_map[connection] = client_address
-
+            connection.send("yes".encode())
             logging.info("New client joined!")
             client_sockets.append(connection)
             self.print_client_sockets(client_sockets)
