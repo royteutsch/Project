@@ -11,11 +11,12 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 
+
 # import mainGUI_support
 
 
 class Toplevel1:
-    def __init__(self, top=None, params=None):
+    def __init__(self, top: tk.Tk = None, params=None):
         super(Toplevel1, self).__init__()
         if params is None:
             params = []
@@ -23,29 +24,37 @@ class Toplevel1:
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
+        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
         top.geometry("885x531+479+210")
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
-        top.resizable(0,  0)
+        top.resizable(0, 0)
         top.title("Project")
         top.configure(background="#d9d9d9")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
 
-        if params[0]:
+        self.Drawings = []  # This will be updated as people draw
+        self.drawn_drawings = []  # Used to remember which drawings have already been rendered, to not redraw everything
+        self.brush = "lineS"  # The current brush
+        self.color = '#000000'  # The current color
+        self.fill = '#ffffff'  # The current fill
+        self.width = 5
+        self.mouseCoords = []  # Used for multi-stroke drawing
+
+        """if params[0]:
             self.net = params[0]  # Either a lobby or a client
         if params[1]:
-            self.status = params[1]  # Whether we are a lobby or a client
+            self.status = params[1]  # Whether we are a lobby or a client"""
 
         self.top = top
 
         self.Canvas = tk.Canvas(self.top)
         self.Canvas.place(relx=0.102, rely=0.019, relheight=0.947
-                , relwidth=0.715)
+                          , relwidth=0.715)
         self.Canvas.configure(background="#d9d9d9")
         self.Canvas.configure(borderwidth="2")
         self.Canvas.configure(highlightbackground="#d9d9d9")
@@ -54,11 +63,12 @@ class Toplevel1:
         self.Canvas.configure(relief="ridge")
         self.Canvas.configure(selectbackground="blue")
         self.Canvas.configure(selectforeground="white")
-        # self.Canvas.bind('<Button-1>', self.draw())
+        self.Canvas.bind('<Button-1>', lambda x: self.draw(1))
+        self.Canvas.bind('<Button-3>', lambda x: self.draw(2))
 
         self.FilterFrame = tk.Frame(self.top)
         self.FilterFrame.place(relx=0.825, rely=0.019, relheight=0.951
-                , relwidth=0.164)
+                               , relwidth=0.164)
         self.FilterFrame.configure(relief='groove')
         self.FilterFrame.configure(borderwidth="2")
         self.FilterFrame.configure(relief="groove")
@@ -80,7 +90,7 @@ class Toplevel1:
 
         self.TimeFilterFrame = tk.Frame(self.FilterFrame)
         self.TimeFilterFrame.place(relx=0.0, rely=0.178, relheight=0.228
-                , relwidth=1.0)
+                                   , relwidth=1.0)
         self.TimeFilterFrame.configure(relief='groove')
         self.TimeFilterFrame.configure(borderwidth="2")
         self.TimeFilterFrame.configure(relief="groove")
@@ -157,7 +167,7 @@ class Toplevel1:
 
         self.ColourFilterFrame = tk.Frame(self.FilterFrame)
         self.ColourFilterFrame.place(relx=0.0, rely=0.396, relheight=0.287
-                , relwidth=1.0)
+                                     , relwidth=1.0)
         self.ColourFilterFrame.configure(relief='groove')
         self.ColourFilterFrame.configure(borderwidth="2")
         self.ColourFilterFrame.configure(relief="groove")
@@ -194,7 +204,7 @@ class Toplevel1:
 
         self.UserFilterFrame = tk.Frame(self.FilterFrame)
         self.UserFilterFrame.place(relx=0.0, rely=0.673, relheight=0.327
-                , relwidth=1.0)
+                                   , relwidth=1.0)
         self.UserFilterFrame.configure(relief='groove')
         self.UserFilterFrame.configure(borderwidth="2")
         self.UserFilterFrame.configure(relief="groove")
@@ -248,6 +258,7 @@ class Toplevel1:
         self.StraightButton.configure(foreground="#000000")
         self.StraightButton.configure(highlightbackground="#d9d9d9")
         self.StraightButton.configure(highlightcolor="black")
+        self.StraightButton.configure(command=lambda: self.changeBrush("lineS"))
         photo_location = "./straightLine.png"
         global _img0
         _img0 = tk.PhotoImage(file=photo_location)
@@ -264,6 +275,7 @@ class Toplevel1:
         self.CurvedButton.configure(foreground="#000000")
         self.CurvedButton.configure(highlightbackground="#d9d9d9")
         self.CurvedButton.configure(highlightcolor="black")
+        self.CurvedButton.configure(command=lambda: self.changeBrush("lineC"))
         photo_location = "./curvedLine.png"
         global _img1
         _img1 = tk.PhotoImage(file=photo_location)
@@ -280,6 +292,7 @@ class Toplevel1:
         self.RectButton.configure(foreground="#000000")
         self.RectButton.configure(highlightbackground="#d9d9d9")
         self.RectButton.configure(highlightcolor="black")
+        self.RectButton.configure(command=lambda: self.changeBrush("rect"))
         photo_location = "./rectangle.png"
         global _img2
         _img2 = tk.PhotoImage(file=photo_location)
@@ -296,6 +309,7 @@ class Toplevel1:
         self.PolyButton.configure(foreground="#000000")
         self.PolyButton.configure(highlightbackground="#d9d9d9")
         self.PolyButton.configure(highlightcolor="black")
+        self.PolyButton.configure(command=lambda: self.changeBrush("poly"))
         photo_location = "./polyhedron.png"
         global _img3
         _img3 = tk.PhotoImage(file=photo_location)
@@ -312,6 +326,7 @@ class Toplevel1:
         self.CircleButton.configure(foreground="#000000")
         self.CircleButton.configure(highlightbackground="#d9d9d9")
         self.CircleButton.configure(highlightcolor="black")
+        self.CircleButton.configure(command=lambda: self.changeBrush("oval"))
         photo_location = "./circle.png"
         global _img4
         _img4 = tk.PhotoImage(file=photo_location)
@@ -334,10 +349,62 @@ class Toplevel1:
         self.ParamButton.configure(image=_img5)
         self.ParamButton.configure(pady="0")
 
-        #self.update()
+        self.update()
 
-    """def update(self):
-        self.Canvas."""
+    def draw(self, mouse_click):
+        """
+        This Function adds one drawing to the self.drawings object through detecting mouse position at the time of click
+
+        In the case of a polyhedron, the program will continue to record the mouse clicks as vertices of the polyhedron
+        until mouse 2 is pressed, at which point the polyhedron will be drawn
+
+        In the case of a curved Line, the program will record the mouse clicks as splines of the line until mouse 2 is
+        pressed, at which point the curve will be drawn
+
+        In all other cases, only 2 clicks with mouse 1 are necessary
+
+        In order to know which mouse button was pressed, the mouse_click parameter is used with either 1 or 2 for
+        the 2 mouse buttons
+        """
+        print("adding draw")
+        if mouse_click == 1:
+            self.mouseCoords += [list((self.top.winfo_pointerx()-self.top.winfo_rootx()-self.Canvas.winfo_x(),
+                                       self.top.winfo_pointery()-self.top.winfo_rooty()-self.Canvas.winfo_y()))]
+            if len(self.mouseCoords) == 2 and self.brush != "poly" and self.brush != "lineC":
+                self.Drawings += [[self.brush, self.color, self.fill, self.width, self.mouseCoords]]
+                self.mouseCoords = []
+        if mouse_click == 2:
+            if self.brush == "poly" or self.brush == "lineC":
+                self.Drawings += [[self.brush, self.color, self.fill, self.width, self.mouseCoords]]
+                self.mouseCoords = []
+
+    def update(self):
+        """
+        This function renders all drawings in the self.drawings list that arent already drawn
+        """
+        print("Drawing...")
+        print(self.Drawings)
+        for drawing in self.Drawings:
+            if drawing not in self.drawn_drawings:
+                # New drawing, draw it
+                print(drawing)
+                b = drawing[0]  # brush
+                if b == "oval":
+                    self.Canvas.create_oval(drawing[-1:][0], fill=drawing[2], outline=drawing[1], width=drawing[3])
+                if b == "rect":
+                    self.Canvas.create_rectangle(drawing[-1:][0], fill=drawing[2], outline=drawing[1], width=drawing[3])
+                if b == "lineS":
+                    self.Canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3])
+                if b == "poly":
+                    self.Canvas.create_polygon(drawing[-1:][0], fill=drawing[2], width=drawing[3], outline=drawing[1])
+                if b == "lineC":
+                    self.Canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3], smooth=True)
+                self.drawn_drawings += [drawing]
+        self.top.after(100, lambda: self.update())
+
+    def changeBrush(self, new_brush):
+        self.brush = new_brush
+
 
 # def start_up():
 #     mainGUI_support.main()
@@ -346,6 +413,3 @@ if __name__ == '__main__':
     root = tkinter.Tk()
     t = Toplevel1(root)
     root.mainloop()
-
-
-
