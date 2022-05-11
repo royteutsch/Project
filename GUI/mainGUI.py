@@ -14,6 +14,7 @@ from tkinter.constants import *
 
 
 # import mainGUI_support
+from GUI import BrushSelectGUI
 
 
 class Toplevel1:
@@ -41,7 +42,7 @@ class Toplevel1:
         self.Drawings = []  # This will be updated as people draw
         self.drawn_drawings = []  # Used to remember which drawings have already been rendered, to not redraw everything
         self.brush = "lineS"  # The current brush
-        self.color = '#000000'  # The current color
+        self.colour = '#000000'  # The current color
         self.fill = '#ffffff'  # The current fill
         self.width = 5
         self.mouseCoords = []  # Used for multi-stroke drawing
@@ -349,6 +350,7 @@ class Toplevel1:
         _img5 = tk.PhotoImage(file=photo_location)
         self.ParamButton.configure(image=_img5)
         self.ParamButton.configure(pady="0")
+        self.ParamButton.configure(command=lambda: self.open_brush_params())
 
         self.update()
         if self.status == "c":
@@ -376,7 +378,7 @@ class Toplevel1:
             self.mouseCoords += [list((self.top.winfo_pointerx()-self.top.winfo_rootx()-self.Canvas.winfo_x(),
                                        self.top.winfo_pointery()-self.top.winfo_rooty()-self.Canvas.winfo_y()))]
             if len(self.mouseCoords) == 2 and self.brush != "poly" and self.brush != "lineC":
-                Drawing = [[self.brush, self.color, self.fill, self.width, self.mouseCoords]]
+                Drawing = [[self.brush, self.colour, self.fill, self.width, self.mouseCoords]]
                 Drawing_string = json.dumps(Drawing)
                 if self.status == "c":  # We're a client
                     self.net.my_socket.send(("D"+Drawing_string).encode())
@@ -386,7 +388,7 @@ class Toplevel1:
                 self.mouseCoords = []
         if mouse_click == 2:
             if self.brush == "poly" or self.brush == "lineC":
-                Drawing = [[self.brush, self.color, self.fill, self.width, self.mouseCoords]]
+                Drawing = [[self.brush, self.colour, self.fill, self.width, self.mouseCoords]]
                 Drawing_string = json.dumps(Drawing)
                 if self.status == "c":  # We're a client
                     self.net.my_socket.send(("D" + Drawing_string).encode())
@@ -399,6 +401,7 @@ class Toplevel1:
         """
         This function renders all drawings in the self.drawings list that arent already drawn
         """
+        self.Drawings=[self.Drawings[x] for x in range(len(self.Drawings)) if not(self.Drawings[x] in self.Drawings[:x])]
         print("Drawing...")
         print(self.Drawings)
         for drawing in self.Drawings:
@@ -430,6 +433,19 @@ class Toplevel1:
 
     def changeBrush(self, new_brush):
         self.brush = new_brush
+
+    def open_brush_params(self):
+        to = tk.Toplevel(self.top)
+        t = BrushSelectGUI.Toplevel1(top=to, outline_colour=self.colour, fill_colour=self.fill, width=self.width)
+        self.top.after(100, lambda :self.await_brush_change(t))
+
+    def await_brush_change(self, t):
+        if t.Changed == 1:
+            self.width = t.Width
+            self.fill = t.FillC
+            self.colour = t.LineC
+            t.Changed = 0
+        self.top.after(100, lambda :self.await_brush_change(t))
 
 
 # def start_up():

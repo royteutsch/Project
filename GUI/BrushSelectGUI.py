@@ -12,8 +12,10 @@ from tkinter.constants import *
 
 # import ColourAddGUI_support
 
+
 class Toplevel1:
-    def __init__(self, top=None):
+    def __init__(self, top=None, outline_colour='#000000', fill_colour='#ffffff', width=5):
+        super(Toplevel1, self).__init__()
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -30,6 +32,21 @@ class Toplevel1:
         top.configure(background="#d9d9d9")
 
         self.top = top
+        self.LineC = outline_colour
+        self.FillC = fill_colour
+        self.LineC_RGB = self.hex_to_rgb(outline_colour[1:])
+        self.FillC_RGB = self.hex_to_rgb(fill_colour[1:])
+        self.Width = width
+        self.WidthVar = tk.IntVar(value=self.Width)
+        self.Changed = 0
+
+        self.LineR = tk.IntVar(value=self.LineC_RGB[0])
+        self.LineG = tk.IntVar(value=self.LineC_RGB[1])
+        self.LineB = tk.IntVar(value=self.LineC_RGB[2])
+
+        self.FillR = tk.IntVar(value=self.FillC_RGB[0])
+        self.FillG = tk.IntVar(value=self.FillC_RGB[1])
+        self.FillB = tk.IntVar(value=self.FillC_RGB[2])
 
         self.ColourPreviewFrame = tk.Frame(self.top)
         self.ColourPreviewFrame.place(relx=0.0, rely=0.0, relheight=0.383
@@ -111,6 +128,7 @@ class Toplevel1:
         self.LineWidthEntry.configure(font="TkFixedFont")
         self.LineWidthEntry.configure(foreground="#000000")
         self.LineWidthEntry.configure(insertbackground="black")
+        self.LineWidthEntry.configure(textvariable=self.WidthVar)
 
         self.LineColourSelectionLabel = tk.Label(self.top)
         self.LineColourSelectionLabel.place(relx=0.02, rely=0.459, height=61
@@ -131,6 +149,7 @@ class Toplevel1:
         self.LineRValueEntry.configure(font="TkFixedFont")
         self.LineRValueEntry.configure(foreground="#000000")
         self.LineRValueEntry.configure(insertbackground="black")
+        self.LineRValueEntry.configure(textvariable=self.LineR)
 
         self.LineGValueEntry = tk.Entry(self.top)
         self.LineGValueEntry.place(relx=0.223, rely=0.51, height=40
@@ -140,6 +159,7 @@ class Toplevel1:
         self.LineGValueEntry.configure(font="TkFixedFont")
         self.LineGValueEntry.configure(foreground="#000000")
         self.LineGValueEntry.configure(insertbackground="black")
+        self.LineGValueEntry.configure(textvariable=self.LineG)
 
         self.LineBValueEntry = tk.Entry(self.top)
         self.LineBValueEntry.place(relx=0.324, rely=0.51, height=40
@@ -149,6 +169,7 @@ class Toplevel1:
         self.LineBValueEntry.configure(font="TkFixedFont")
         self.LineBValueEntry.configure(foreground="#000000")
         self.LineBValueEntry.configure(insertbackground="black")
+        self.LineBValueEntry.configure(textvariable=self.LineB)
 
         self.FillColourSelectionLabel = tk.Label(self.top)
         self.FillColourSelectionLabel.place(relx=0.506, rely=0.459, height=61
@@ -169,6 +190,7 @@ class Toplevel1:
         self.FillRValueEntry.configure(font="TkFixedFont")
         self.FillRValueEntry.configure(foreground="#000000")
         self.FillRValueEntry.configure(insertbackground="black")
+        self.FillRValueEntry.configure(textvariable=self.FillR)
 
         self.FillGValueEntry = tk.Entry(self.top)
         self.FillGValueEntry.place(relx=0.688, rely=0.51, height=40
@@ -178,6 +200,7 @@ class Toplevel1:
         self.FillGValueEntry.configure(font="TkFixedFont")
         self.FillGValueEntry.configure(foreground="#000000")
         self.FillGValueEntry.configure(insertbackground="black")
+        self.FillGValueEntry.configure(textvariable=self.FillG)
 
         self.FillBValueEntry = tk.Entry(self.top)
         self.FillBValueEntry.place(relx=0.789, rely=0.51, height=40
@@ -187,6 +210,49 @@ class Toplevel1:
         self.FillBValueEntry.configure(font="TkFixedFont")
         self.FillBValueEntry.configure(foreground="#000000")
         self.FillBValueEntry.configure(insertbackground="black")
+        self.FillBValueEntry.configure(textvariable=self.FillB)
+
+        self.ApplyButton = tk.Button(self.top)
+        self.ApplyButton.place(relx=0.395, rely=0.8, height=40, width=100)
+        self.ApplyButton.configure(activebackground="#ececec")
+        self.ApplyButton.configure(activeforeground="#000000")
+        self.ApplyButton.configure(background="#d9d9d9")
+        self.ApplyButton.configure(compound='left')
+        self.ApplyButton.configure(disabledforeground="#a3a3a3")
+        self.ApplyButton.configure(font="-family {David} -size 18")
+        self.ApplyButton.configure(foreground="#000000")
+        self.ApplyButton.configure(highlightbackground="#d9d9d9")
+        self.ApplyButton.configure(highlightcolor="black")
+        self.ApplyButton.configure(pady="0")
+        self.ApplyButton.configure(text='''Apply''')
+        self.ApplyButton.configure(command=lambda: self.apply_colour())
+
+        self.apply_colour()
+
+    def hex_to_rgb(self, hex) -> tuple[int, ...]:
+        rgb = []
+        for i in (0, 2, 4):
+            decimal = int(hex[i:i + 2], 16)
+            rgb.append(decimal)
+        return tuple(rgb)
+
+    def rgb_to_hex(self, rgb: tuple[int, int, int]) -> str:
+        print(str(rgb))
+        print('#'+'%02x%02x%02x' % rgb)
+        return '#' + '%02x%02x%02x' % rgb
+
+    def apply_colour(self):
+        # Change Our parameters according to entered parameters, and update previews
+        new_line = (self.LineR.get(), self.LineG.get(), self.LineB.get())
+        self.LineC = self.rgb_to_hex(new_line)
+        new_fill = (self.FillR.get(), self.FillG.get(), self.FillB.get())
+        self.FillC = self.rgb_to_hex(new_fill)
+        self.Width = self.WidthVar.get()
+
+        self.LineColourPreview.configure(background=self.LineC)
+        self.FillColourPreview.configure(background=self.FillC)
+        self.Changed = 1
+
 
 #def start_up():
 #    ColourAddGUI_support.main()
