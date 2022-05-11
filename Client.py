@@ -1,4 +1,5 @@
 import hashlib
+import json
 import logging
 import select
 import socket
@@ -61,9 +62,12 @@ class User:
 
     def wait_for_lobby(self):
         # Requires Connection to Lobby. Waits until lobby sends "D" for drawing and changes to drawing mode
-        confirmation = self.my_socket.recv(1024).decode()
-        if confirmation == "D":
-            self.drawing = 1
+        self.rlist, wlist, xlist = select.select([self.my_socket], [], [], 0.1)
+        for current_socket in self.rlist:
+            confirmation = current_socket.recv(1024).decode()
+            if confirmation == "D":
+                self.drawing = 1
+
 
 class Lobby:
     def __init__(self, lobby_name, priv_or_publ):
@@ -126,7 +130,13 @@ class Lobby:
                 socket_address = self.socket_address_map[current_socket]
                 self.connected_users[params] = socket_address[0]
                 print("User " + params + " Added to user list")
-            # TODO: ADD RECEIVING DRAWINGS AND ADDING TO DATA USING PROCEDURE FOR LONG MESSAGE RECEIVES
+            if command == "D":  # A client drew a drawing, send it to all other clients
+                self.update_clients(params)
+
+    def update_clients(self, drawing_string):
+        drawing = json.loads(drawing_string)
+        self.data += drawing
+        self.send_to_everyone(drawing_string)
 
     def check_popup(self, t, current_socket, root, connection_address):
         if t.confirm == 0:  # Lobby manager did not allow the user to join
@@ -168,5 +178,6 @@ class Lobby:
                 self.messages_to_send.remove(message)
 
     def send_to_everyone(self, message: str):
+        print("Message: "+message+" Sent to Everyone")
         for current_socket in self.client_sockets:
             current_socket.send(message.encode())

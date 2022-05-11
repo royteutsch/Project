@@ -63,14 +63,16 @@ class Toplevel1(GUI):
         self.Label2.configure(foreground="#000000")
         self.Label2.configure(text='''Please Wait...''')
 
-        self.top.after(100, lambda: self.Client.wait_for_lobby())
-        self.top.after(100, lambda: self.wait())
+        self.top.after(1000, self.wait)
 
     def wait(self):
+        self.top.after(100, self.Client.wait_for_lobby)
         if self.Client.drawing == 1:
+            print("Done Waiting")
             self.replaceGUI(mainGUI, self.top, [self.Client, "c"])
         else:
-            self.top.after(100, lambda: self.wait())
+            print("Waiting...")
+            self.top.after(1000, self.wait)
 
 #def start_up():
 #    LobbyWaitGUI_support.main()
