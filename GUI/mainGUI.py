@@ -353,6 +353,8 @@ class Toplevel1:
         self.update()
         if self.status == "c":
             self.top.after(100, lambda: self.client_update())
+        else:
+            self.net.get_gui_drawing(self.Drawings)
 
     def draw(self, mouse_click):
         """
@@ -422,9 +424,9 @@ class Toplevel1:
         for current_socket in self.rlist:
             new_drawing_string = current_socket.recv(1024).decode()
             print("New Drawing: "+new_drawing_string)
-            self.top.after(1000, lambda: self.client_update())
             new_drawing = json.loads(new_drawing_string)
             self.Drawings += new_drawing
+        self.top.after(1000, lambda: self.client_update())
 
     def changeBrush(self, new_brush):
         self.brush = new_brush

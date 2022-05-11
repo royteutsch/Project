@@ -133,9 +133,13 @@ class Lobby:
             if command == "D":  # A client drew a drawing, send it to all other clients
                 self.update_clients(params)
 
+    def get_gui_drawing(self, gui_drawing):
+        self.gui_drawing = gui_drawing
+
     def update_clients(self, drawing_string):
         drawing = json.loads(drawing_string)
         self.data += drawing
+        self.gui_drawing += drawing
         self.send_to_everyone(drawing_string)
 
     def check_popup(self, t, current_socket, root, connection_address):
