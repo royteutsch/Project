@@ -6,6 +6,7 @@
 #    Feb 23, 2022 02:05:48 PM +0200  platform: Windows NT
 import select
 import sys
+import time
 import tkinter
 import tkinter as tk
 import json
@@ -39,6 +40,8 @@ class Toplevel1:
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
 
+        self.start = time.time()
+
         self.Drawings = []  # This will be updated as people draw
         self.drawn_drawings = []  # Used to remember which drawings have already been rendered, to not redraw everything
         self.brush = "lineS"  # The current brush
@@ -46,6 +49,12 @@ class Toplevel1:
         self.fill = '#ffffff'  # The current fill
         self.width = 5
         self.mouseCoords = []  # Used for multi-stroke drawing
+        self.blacklist = []
+
+        self.time_var = tk.IntVar()
+        self.colour_var = tk.IntVar()
+        self.user_var = tk.IntVar()
+        self.all_filter_var = tk.IntVar()
 
         if params[0]:
             self.net = params[0]  # Either a lobby or a client
@@ -167,6 +176,22 @@ class Toplevel1:
         self.ExplanationLabel.configure(highlightcolor="black")
         self.ExplanationLabel.configure(text='''Leave Empty for Present''')
 
+        self.TimeFilterCheck = tk.Checkbutton(self.TimeFilterFrame)
+        self.TimeFilterCheck.place(relx=0.069, rely=0.522, relheight=0.217, relwidth = 0.421)
+        self.TimeFilterCheck.configure(activebackground="#ececec")
+        self.TimeFilterCheck.configure(activeforeground="#000000")
+        self.TimeFilterCheck.configure(anchor='w')
+        self.TimeFilterCheck.configure(background="#d9d9d9")
+        self.TimeFilterCheck.configure(compound='left')
+        self.TimeFilterCheck.configure(disabledforeground="#a3a3a3")
+        self.TimeFilterCheck.configure(foreground="#000000")
+        self.TimeFilterCheck.configure(highlightbackground="#d9d9d9")
+        self.TimeFilterCheck.configure(highlightcolor="black")
+        self.TimeFilterCheck.configure(justify='left')
+        self.TimeFilterCheck.configure(selectcolor="#d9d9d9")
+        self.TimeFilterCheck.configure(text='''Active''')
+        self.TimeFilterCheck.configure(variable=self.time_var)
+
         self.ColourFilterFrame = tk.Frame(self.FilterFrame)
         self.ColourFilterFrame.place(relx=0.0, rely=0.396, relheight=0.287
                                      , relwidth=1.0)
@@ -204,6 +229,22 @@ class Toplevel1:
         self.ColourButton.configure(pady="0")
         self.ColourButton.configure(text='''Choose''')
 
+        self.ColourFilterCheck = tk.Checkbutton(self.ColourFilterFrame)
+        self.ColourFilterCheck.place(relx=0.276, rely=0.345, relheight=0.172, relwidth = 0.421)
+        self.ColourFilterCheck.configure(activebackground="#ececec")
+        self.ColourFilterCheck.configure(activeforeground="#000000")
+        self.ColourFilterCheck.configure(anchor='w')
+        self.ColourFilterCheck.configure(background="#d9d9d9")
+        self.ColourFilterCheck.configure(compound='left')
+        self.ColourFilterCheck.configure(disabledforeground="#a3a3a3")
+        self.ColourFilterCheck.configure(foreground="#000000")
+        self.ColourFilterCheck.configure(highlightbackground="#d9d9d9")
+        self.ColourFilterCheck.configure(highlightcolor="black")
+        self.ColourFilterCheck.configure(justify='left')
+        self.ColourFilterCheck.configure(selectcolor="#d9d9d9")
+        self.ColourFilterCheck.configure(text='''Active''')
+        self.ColourFilterCheck.configure(variable=self.colour_var)
+
         self.UserFilterFrame = tk.Frame(self.FilterFrame)
         self.UserFilterFrame.place(relx=0.0, rely=0.673, relheight=0.327
                                    , relwidth=1.0)
@@ -240,6 +281,38 @@ class Toplevel1:
         self.UserButton.configure(highlightcolor="black")
         self.UserButton.configure(pady="0")
         self.UserButton.configure(text='''Choose''')
+
+        self.UserFilterCheck = tk.Checkbutton(self.UserFilterFrame)
+        self.UserFilterCheck.place(relx=0.276, rely=0.424, relheight=0.152, relwidth = 0.421)
+        self.UserFilterCheck.configure(activebackground="#ececec")
+        self.UserFilterCheck.configure(activeforeground="#000000")
+        self.UserFilterCheck.configure(anchor='w')
+        self.UserFilterCheck.configure(background="#d9d9d9")
+        self.UserFilterCheck.configure(compound='left')
+        self.UserFilterCheck.configure(disabledforeground="#a3a3a3")
+        self.UserFilterCheck.configure(foreground="#000000")
+        self.UserFilterCheck.configure(highlightbackground="#d9d9d9")
+        self.UserFilterCheck.configure(highlightcolor="black")
+        self.UserFilterCheck.configure(justify='left')
+        self.UserFilterCheck.configure(selectcolor="#d9d9d9")
+        self.UserFilterCheck.configure(text='''Active''')
+        self.UserFilterCheck.configure(variable=self.user_var)
+
+        self.ActivateAllFilter = tk.Checkbutton(self.FilterFrame)
+        self.ActivateAllFilter.place(relx=0.207, rely=0.119, relheight=0.05, relwidth = 0.559)
+        self.ActivateAllFilter.configure(activebackground="#ececec")
+        self.ActivateAllFilter.configure(activeforeground="#000000")
+        self.ActivateAllFilter.configure(anchor='w')
+        self.ActivateAllFilter.configure(background="#d9d9d9")
+        self.ActivateAllFilter.configure(compound='left')
+        self.ActivateAllFilter.configure(disabledforeground="#a3a3a3")
+        self.ActivateAllFilter.configure(foreground="#000000")
+        self.ActivateAllFilter.configure(highlightbackground="#d9d9d9")
+        self.ActivateAllFilter.configure(highlightcolor="black")
+        self.ActivateAllFilter.configure(justify='left')
+        self.ActivateAllFilter.configure(selectcolor="#d9d9d9")
+        self.ActivateAllFilter.configure(text='''Active All''')
+        self.ActivateAllFilter.configure(variable=self.all_filter_var)
 
         self.Frame1 = tk.Frame(self.top)
         self.Frame1.place(relx=0.0, rely=0.038, relheight=0.838, relwidth=0.096)
@@ -358,6 +431,20 @@ class Toplevel1:
         else:
             self.net.get_gui_drawing(self.Drawings)
 
+    def change_filters(self, time, colour, user):
+        # updates self.blacklist
+        for drawing in self.Drawings:
+            if time == 1:
+                drawing_time = drawing[4]
+                if self.FromEntry.get():
+                    if drawing_time < self.FromEntry.get():
+                        self.blacklist += drawing
+                if self.ToEntry.get():
+                    if drawing_time > self.ToEntry.get():
+                        self.blacklist += drawing
+        self.drawn_drawings = []
+        self.Canvas.delete('all')
+
     def draw(self, mouse_click):
         """
         This Function adds one drawing to the self.drawings object through detecting mouse position at the time of click
@@ -378,7 +465,8 @@ class Toplevel1:
             self.mouseCoords += [list((self.top.winfo_pointerx()-self.top.winfo_rootx()-self.Canvas.winfo_x(),
                                        self.top.winfo_pointery()-self.top.winfo_rooty()-self.Canvas.winfo_y()))]
             if len(self.mouseCoords) == 2 and self.brush != "poly" and self.brush != "lineC":
-                Drawing = [[self.brush, self.colour, self.fill, self.width, self.mouseCoords]]
+                Drawing = [[self.brush, self.colour, self.fill, self.width,
+                            time.time()-self.start, self.mouseCoords]]
                 Drawing_string = json.dumps(Drawing)
                 if self.status == "c":  # We're a client
                     self.net.my_socket.send(("D"+Drawing_string).encode())
@@ -388,7 +476,8 @@ class Toplevel1:
                 self.mouseCoords = []
         if mouse_click == 2:
             if self.brush == "poly" or self.brush == "lineC":
-                Drawing = [[self.brush, self.colour, self.fill, self.width, self.mouseCoords]]
+                Drawing = [[self.brush, self.colour, self.fill, self.width,
+                            time.time()-self.start, self.mouseCoords]]
                 Drawing_string = json.dumps(Drawing)
                 if self.status == "c":  # We're a client
                     self.net.my_socket.send(("D" + Drawing_string).encode())
@@ -401,11 +490,18 @@ class Toplevel1:
         """
         This function renders all drawings in the self.drawings list that arent already drawn
         """
+        if self.all_filter_var.get() == 1:
+            self.user_var.set(1)
+            self.colour_var.set(1)
+            self.time_var.set(1)
+            self.all_filter_var.set(0)
+        if self.user_var.get() == 1 or self.colour_var.get() == 1 or self.time_var.get() == 1:
+            self.change_filters(self.user_var.get(), self.colour_var.get(), self.time_var.get())
         self.Drawings=[self.Drawings[x] for x in range(len(self.Drawings)) if not(self.Drawings[x] in self.Drawings[:x])]
         print("Drawing...")
         print(self.Drawings)
         for drawing in self.Drawings:
-            if drawing not in self.drawn_drawings:
+            if drawing not in self.drawn_drawings and drawing not in self.blacklist:
                 # New drawing, draw it
                 print(drawing)
                 b = drawing[0]  # brush
@@ -420,7 +516,7 @@ class Toplevel1:
                 if b == "lineC":
                     self.Canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3], smooth=True)
                 self.drawn_drawings += [drawing]
-        self.top.after(1000, lambda: self.update())
+        self.top.after(100, lambda: self.update())
 
     def client_update(self):
         self.rlist, wlist, xlist = select.select([self.net.my_socket], [], [], 0.01)
