@@ -92,6 +92,7 @@ class Lobby:
         self.my_socket.connect((ip, port))
         self.my_socket.send("L".encode())
         self.id = self.my_socket.recv(512).decode()
+        self.bg_file_destination = ''
 
         print("Finished making lobby credentials")
         # Setting up the mini server
@@ -183,6 +184,18 @@ class Lobby:
         t = GUI.UserPromptGUI.Toplevel1(username=username, top=root)
         root.after(100, lambda: self.check_popup(t, current_socket, root, connection_address))
 
+    def send_bg_file(self, file_dest):
+        """self.bg_file_destination = file_dest
+        bg_file = open(self.bg_file_destination, 'rb')
+        message = str(bg_file.read())
+        length = str(len(message))
+        print(length)
+        length_of_length = str(len(length)).zfill(4)
+        final_message = "B" + length_of_length + length + message
+        print("Bg: " + self.bg_file_destination)
+        self.send_to_everyone(final_message)"""
+        pass
+
     def one_loop(self):
         print("main looping")
         self.rlist, wlist, xlist = select.select([self.server_socket] + self.client_sockets, [], [], 0.1)
@@ -200,6 +213,7 @@ class Lobby:
                 self.messages_to_send.remove(message)
 
     def send_to_everyone(self, message: str):
+        # Sends Message to all clients
         print("Message: "+message+" Sent to Everyone")
         for current_socket in self.client_sockets:
             current_socket.send(message.encode())

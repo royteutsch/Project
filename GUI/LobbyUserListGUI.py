@@ -43,7 +43,6 @@ class Toplevel1:
 
         self.listvar = self.list_to_stringvar(self.user_list)
         self.top = top
-
         self.UserList = ScrolledListBox(self.top)
         self.UserList.place(relx=0.0, rely=0.0, relheight=0.979, relwidth=0.966)
         self.UserList.configure(background="white")

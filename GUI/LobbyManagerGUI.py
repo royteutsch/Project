@@ -6,6 +6,7 @@
 #    Feb 17, 2022 11:55:11 AM +0200  platform: Windows NT
 import ast
 import sys
+from tkinter import filedialog
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
@@ -40,6 +41,7 @@ class Toplevel1(GUI):
         self.users = []
         self.users_string = ""
         self.user_list_text_variable = tk.StringVar()
+        self.bg_file = tk.StringVar()
 
         if params[2]:
             self.client = params[2]
@@ -117,14 +119,14 @@ class Toplevel1(GUI):
         self.widgets.append(self.SeeAll)
 
         self.BGFileLabel = tk.Label(self.top)
-        self.BGFileLabel.place(relx=0.037, rely=0.6, height=41, width=363)
+        self.BGFileLabel.place(relx=0.037, rely=0.6, height=41, width=2000)
         self.BGFileLabel.configure(anchor='w')
         self.BGFileLabel.configure(background="#d9d9d9")
         self.BGFileLabel.configure(compound='left')
         self.BGFileLabel.configure(disabledforeground="#a3a3a3")
         self.BGFileLabel.configure(font="-family {David} -size 16")
         self.BGFileLabel.configure(foreground="#000000")
-        self.BGFileLabel.configure(text='''BG File:''')
+        self.BGFileLabel.configure(text='''BG File:''' + self.bg_file.get())
         self.widgets.append(self.BGFileLabel)
 
         self.UploadButton = tk.Button(self.top)
@@ -140,6 +142,7 @@ class Toplevel1(GUI):
         self.UploadButton.configure(highlightcolor="black")
         self.UploadButton.configure(pady="0")
         self.UploadButton.configure(text='''Upload''')
+        self.UploadButton.configure(command=lambda: self.choose_file())
         self.widgets.append(self.UploadButton)
 
         self.StartSessionButton = tk.Button(self.top)
@@ -178,6 +181,20 @@ class Toplevel1(GUI):
         self.users_string = ret[:-1]
         self.user_list_text_variable.set('''Connected: ''' + self.users_string)
 
+    def choose_file(self):
+        filetypes = (
+            ('svg files', '*.svg'),
+        )
+
+        filename = filedialog.askopenfilename(
+            title='Open File',
+            initialdir='/',
+            filetypes=filetypes
+        )
+
+        self.bg_file.set(filename)
+        self.BGFileLabel.configure(text='''BG File:''' + self.bg_file.get())  # Update text in the label
+
     def view_clients(self):
         t = tk.Toplevel(self.top)
         user_list_view = LobbyUserListGUI.Toplevel1(top=t, users=ast.literal_eval(self.lobby.send_names()))
@@ -185,6 +202,8 @@ class Toplevel1(GUI):
 
     def start_drawing(self):
         self.lobby.send_to_everyone("D")
+        if len(self.bg_file.get()) > 0:  # We have a selected bg file
+            self.lobby.send_bg_file(self.bg_file.get())
         self.replaceGUI(mainGUI, self.top, [self.lobby, "l"])
 # def start_up():
 #     LobbyManagerGUI_support.main()

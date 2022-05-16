@@ -11,8 +11,10 @@ import time
 import tkinter
 import tkinter as tk
 import json
-import tkinter.ttk as ttk
-from tkinter.constants import *
+from svglib.svglib import svg2rlg
+from reportlab.graphics import renderPDF, renderPM
+from PIL import Image, ImageTk
+
 
 
 # import mainGUI_support
@@ -430,13 +432,14 @@ class Toplevel1:
         self.ParamButton.configure(image=_img5)
         self.ParamButton.configure(pady="0")
         self.ParamButton.configure(command=lambda: self.open_brush_params())
-
         self.update()
         if self.status == "c":
             self.name = self.net.Username
             self.top.after(100, lambda: self.client_update())
         else:
             self.name = self.net.client_name
+            """if self.net.bg_file_destination != '':
+                self.set_as_bg(self.net.bg_file_destination)"""
             self.top.after(100, lambda: self.lobby_update())
 
     def change_filters(self, time, colour, user):
@@ -460,7 +463,7 @@ class Toplevel1:
                         print(str(drawing) + "Added to blacklist")
                         self.blacklist += drawing
                 if user == 1:
-                    drawing_user = drawing[5]   
+                    drawing_user = drawing[5]
                     if drawing_user in self.user_filter_list:
                         print(str(drawing) + "Added to blacklist")
                         self.blacklist += drawing
@@ -548,14 +551,41 @@ class Toplevel1:
     def client_update(self):
         self.rlist, wlist, xlist = select.select([self.net.my_socket], [], [], 0.01)
         for current_socket in self.rlist:
-            new_drawing_string = current_socket.recv(4096).decode()
-            if new_drawing_string[0] != "L":
+            command = current_socket.recv(1).decode()
+            if command == "B":  # recieve full svg file, set as background
+                length_of_lengths = current_socket.recv(4).decode()
+                message_length = int(current_socket.recv(int(length_of_lengths)).decode())
+                f = open('saved.svg', 'wb')
+                f.write(''.encode())
+                f.close()
+                f = open('saved.svg', 'ab')
+                while not message_length == 0:
+                    if message_length <= 9999:
+                        data = current_socket.recv(message_length)
+                        f.write(data)
+                        break
+                    data = current_socket.recv(9999)
+                    f.write(data)
+                    print("handling...")
+                    message_length -= 9999
+                f.close()
+            elif command != "L":
+                # In this case, command is not a command, but part of the drawing,
+                # and as such it should be appended at the start of new_drawing_string
+                new_drawing_string = command + current_socket.recv(4096).decode()
                 print("New Drawing: "+new_drawing_string)
                 new_drawing = json.loads(new_drawing_string)
                 self.Drawings += new_drawing
             else:
-                self.net.parse_connected_clients(new_drawing_string)
+                names = current_socket.recv(4096).decode()
+                self.net.parse_connected_clients(names)
         self.top.after(1000, lambda: self.client_update())
+
+    """def set_as_bg(self, file_dest):
+        img = SvgImage(master=self.top, file=file_dest, scale=1)
+        self.Canvas.create_image(0,0,anchor='nw',image=img)
+        #self.Canvas.create_image(int(self.Canvas.winfo_width() / 2), int(self.Canvas.winfo_height() / 2), image=pimg)
+    """
 
     def lobby_update(self):
         self.Drawings = self.net.get_data()
@@ -611,6 +641,59 @@ class Toplevel1:
             self.colour = t.LineC
             t.Changed = 0
         self.top.after(100, lambda :self.await_brush_change(t))
+
+"""class SvgImage(tk.PhotoImage):
+    Widget which can display images in PGM, PPM, GIF, PNG format.
+    _tksvg_loaded = False
+    _svg_options = ['scale', 'scaletowidth', 'scaletoheight']
+
+    def __init__(self, name=None, cnf={}, master=None, **kw):
+        # load tksvg
+        if not SvgImage._tksvg_loaded:
+            if master is None:
+                master = tk._default_root
+                if not master:
+                    raise RuntimeError('Too early to create image')
+            # master.tk.eval('package require tksvg')
+            SvgImage._tksvg_loaded = True
+        # remove specific svg options from keywords
+        svgkw = {opt: kw.pop(opt, None) for opt in self._svg_options}
+        tk.PhotoImage.__init__(self, name, cnf, master, **kw)
+        # pass svg options
+        self.configure(**svgkw)
+
+    def configure(self, **kw):
+        svgkw = {opt: kw.pop(opt) for opt in self._svg_options if opt in kw}
+        # non svg options
+        if kw:
+            tk.PhotoImage.configure(self, **kw)
+        # svg options
+        options = ()
+        for k, v in svgkw.items():
+            if v is not None:
+                options = options + ('-'+k, str(v))
+        self.tk.eval('%s configure -format {svg %s}' % (self.name, ' '.join(options)))
+
+
+
+
+
+
+
+
+
+
+
+This was part of a cut Feature: Adding svg files as background
+unfortunately, reading the svg file using svg2rlg caused an obscure error when on mainGUI
+(As there were no errors when the same method was used in test.py), 
+and the obscure error had only 4 results come up when searched, none of which were relevent
+
+The above class also did not work, as it did not detect the package tksvg even after said package was downloaded.
+
+As such, I saw no way to Implement svg backgrounds. The button is still there on the lobbymanagerGUI,
+but it will not effect the drawing in any way
+"""
 
 # def start_up():
 #     mainGUI_support.main()
