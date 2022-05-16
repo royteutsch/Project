@@ -13,7 +13,7 @@ from tkinter.constants import *
 # import LobbyUserListGUI_support
 
 class Toplevel1:
-    def __init__(self, top=None):
+    def __init__(self, top=None, users=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -36,27 +36,40 @@ class Toplevel1:
         top.title("Toplevel 0")
         top.configure(background="#d9d9d9")
 
+        if users is not None:
+            self.user_list = users  # A list of all users that we put in
+        else:
+            self.user_list = []
+
+        self.listvar = self.list_to_stringvar(self.user_list)
         self.top = top
 
-        self.UserList = ScrolledWindow(self.top)
+        self.UserList = ScrolledListBox(self.top)
         self.UserList.place(relx=0.0, rely=0.0, relheight=0.979, relwidth=0.966)
         self.UserList.configure(background="white")
-        self.UserList.configure(borderwidth="2")
+        self.UserList.configure(cursor="xterm")
+        self.UserList.configure(disabledforeground="#a3a3a3")
+        self.UserList.configure(font="TkFixedFont")
+        self.UserList.configure(foreground="black")
         self.UserList.configure(highlightbackground="#d9d9d9")
-        self.UserList.configure(highlightcolor="black")
-        self.UserList.configure(insertbackground="black")
-        self.UserList.configure(relief="groove")
+        self.UserList.configure(highlightcolor="#d9d9d9")
         self.UserList.configure(selectbackground="blue")
         self.UserList.configure(selectforeground="white")
-        self.color = self.UserList.cget("background")
-        self.UserList_f = tk.Frame(self.UserList,
-                            background=self.color)
-        self.UserList.create_window(0, 0, anchor='nw',
-                                           window=self.UserList_f)
+        self.UserList.configure(listvariable=self.listvar)
+
+    def list_to_stringvar(self, lst) -> tk.StringVar:
+        strvar = ''
+        for item in lst:
+            strvar += str(item) + " "
+        strvar = strvar[:-1]
+        listvar = tk.StringVar(value=strvar)
+        print(listvar.get())
+        return listvar
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
     '''Configure the scrollbars for a widget.'''
+
     def __init__(self, master):
         #  Rozen. Added the try-except clauses so that this class
         #  could be used for scrolled entry widget for which vertical
@@ -89,6 +102,7 @@ class AutoScroll(object):
     @staticmethod
     def _autoscroll(sbar):
         '''Hide and show scrollbar as needed.'''
+
         def wrapped(first, last):
             first, last = float(first), float(last)
             if first <= 0 and last >= 1:
@@ -96,30 +110,43 @@ class AutoScroll(object):
             else:
                 sbar.grid()
             sbar.set(first, last)
+
         return wrapped
 
     def __str__(self):
         return str(self.master)
 
+
 def _create_container(func):
     '''Creates a ttk Frame with a given master, and use this new frame to
     place the scrollbars and the widget.'''
+
     def wrapped(cls, master, **kw):
         container = ttk.Frame(master)
         container.bind('<Enter>', lambda e: _bound_to_mousewheel(e, container))
         container.bind('<Leave>', lambda e: _unbound_to_mousewheel(e, container))
         return func(cls, container, **kw)
+
     return wrapped
 
-class ScrolledWindow(AutoScroll, tk.Canvas):
-    '''A standard Tkinter Canvas widget with scrollbars that will
+
+class ScrolledListBox(AutoScroll, tk.Listbox):
+    '''A standard Tkinter Listbox widget with scrollbars that will
     automatically show/hide as needed.'''
+
     @_create_container
     def __init__(self, master, **kw):
-        tk.Canvas.__init__(self, master, **kw)
+        tk.Listbox.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
 
+    def size_(self):
+        sz = tk.Listbox.size(self)
+        return sz
+
+
 import platform
+
+
 def _bound_to_mousewheel(event, widget):
     child = widget.winfo_children()[0]
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
@@ -131,6 +158,7 @@ def _bound_to_mousewheel(event, widget):
         child.bind_all('<Shift-Button-4>', lambda e: _on_shiftmouse(e, child))
         child.bind_all('<Shift-Button-5>', lambda e: _on_shiftmouse(e, child))
 
+
 def _unbound_to_mousewheel(event, widget):
     if platform.system() == 'Windows' or platform.system() == 'Darwin':
         widget.unbind_all('<MouseWheel>')
@@ -141,22 +169,24 @@ def _unbound_to_mousewheel(event, widget):
         widget.unbind_all('<Shift-Button-4>')
         widget.unbind_all('<Shift-Button-5>')
 
+
 def _on_mousewheel(event, widget):
     if platform.system() == 'Windows':
-        widget.yview_scroll(-1*int(event.delta/120),'units')
+        widget.yview_scroll(-1 * int(event.delta / 120), 'units')
     elif platform.system() == 'Darwin':
-        widget.yview_scroll(-1*int(event.delta),'units')
+        widget.yview_scroll(-1 * int(event.delta), 'units')
     else:
         if event.num == 4:
             widget.yview_scroll(-1, 'units')
         elif event.num == 5:
             widget.yview_scroll(1, 'units')
 
+
 def _on_shiftmouse(event, widget):
     if platform.system() == 'Windows':
-        widget.xview_scroll(-1*int(event.delta/120), 'units')
+        widget.xview_scroll(-1 * int(event.delta / 120), 'units')
     elif platform.system() == 'Darwin':
-        widget.xview_scroll(-1*int(event.delta), 'units')
+        widget.xview_scroll(-1 * int(event.delta), 'units')
     else:
         if event.num == 4:
             widget.xview_scroll(-1, 'units')
