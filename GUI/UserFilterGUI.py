@@ -12,11 +12,15 @@ from tkinter.constants import *
 
 
 # import ColourFilterGUI_support
+from GUI import UserFilterAddGUI
+
 
 class Toplevel1:
-    def __init__(self, top=None):
+    def __init__(self, top=None, current_users=None, all_users=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
+        if current_users is None:
+            current_users = []
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -38,42 +42,15 @@ class Toplevel1:
         top.configure(background="#d9d9d9")
 
         self.top = top
-        self.selectedButton = tk.IntVar()
-
-        self.WhiteListButton = tk.Radiobutton(self.top)
-        self.WhiteListButton.place(relx=0.0, rely=0.032, relheight=0.08
-                                   , relwidth=0.476)
-        self.WhiteListButton.configure(activebackground="#ececec")
-        self.WhiteListButton.configure(activeforeground="#000000")
-        self.WhiteListButton.configure(anchor='w')
-        self.WhiteListButton.configure(background="#d9d9d9")
-        self.WhiteListButton.configure(compound='left')
-        self.WhiteListButton.configure(disabledforeground="#a3a3a3")
-        self.WhiteListButton.configure(foreground="#000000")
-        self.WhiteListButton.configure(highlightbackground="#d9d9d9")
-        self.WhiteListButton.configure(highlightcolor="black")
-        self.WhiteListButton.configure(justify='left')
-        self.WhiteListButton.configure(text='''W''')
-        self.WhiteListButton.configure(variable=self.selectedButton)
-
-        self.BlackListButton = tk.Radiobutton(self.top)
-        self.BlackListButton.place(relx=0.485, rely=0.032, relheight=0.08
-                                   , relwidth=0.52)
-        self.BlackListButton.configure(activebackground="#ececec")
-        self.BlackListButton.configure(activeforeground="#000000")
-        self.BlackListButton.configure(anchor='w')
-        self.BlackListButton.configure(background="#d9d9d9")
-        self.BlackListButton.configure(compound='left')
-        self.BlackListButton.configure(disabledforeground="#a3a3a3")
-        self.BlackListButton.configure(foreground="#000000")
-        self.BlackListButton.configure(highlightbackground="#d9d9d9")
-        self.BlackListButton.configure(highlightcolor="black")
-        self.BlackListButton.configure(justify='left')
-        self.BlackListButton.configure(text='''B''')
-        self.BlackListButton.configure(variable=self.selectedButton)
+        if current_users is not None:
+            self.user_list = current_users  # A list of all users that we put in
+        else:
+            self.user_list = []
+        self.listvar = tk.StringVar()
+        self.all_users = all_users
 
         self.UserBox = ScrolledListBox(self.top)
-        self.UserBox.place(relx=0.0, rely=0.16, relheight=0.623
+        self.UserBox.place(relx=0.0, rely=0.06, relheight=0.723
                            , relwidth=0.974)
         self.UserBox.configure(background="white")
         self.UserBox.configure(cursor="xterm")
@@ -84,6 +61,7 @@ class Toplevel1:
         self.UserBox.configure(highlightcolor="#d9d9d9")
         self.UserBox.configure(selectbackground="blue")
         self.UserBox.configure(selectforeground="white")
+        self.UserBox.configure(listvariable=self.listvar)
 
         self.AddUserButton = tk.Button(self.top)
         self.AddUserButton.place(relx=0.0, rely=0.799, height=64, width=227)
@@ -98,7 +76,40 @@ class Toplevel1:
         self.AddUserButton.configure(highlightcolor="black")
         self.AddUserButton.configure(pady="0")
         self.AddUserButton.configure(text='''Add''')
+        self.AddUserButton.configure(command=lambda :self.get_new_user())
 
+        self.top.after(100, lambda: self.update_listvar())
+
+    def update_listvar(self):
+        self.listvar = self.list_to_stringvar(self.user_list)
+        self.UserBox.configure(listvariable=self.listvar)
+        self.top.after(100, lambda: self.update_listvar())
+
+    def get_new_user(self):
+        to = tk.Toplevel(self.top)
+        self.user_filter = UserFilterAddGUI.Toplevel1(top=to, users=self.all_users)
+        self.top.after(100, lambda: self.await_new_user())
+
+    def await_new_user(self):
+        if self.user_filter.final_name is not "":
+            print(self.user_filter.final_name)
+            if self.user_filter.final_name not in self.user_list:
+                self.user_list.append(self.user_filter.final_name)
+            else:
+                self.user_list.remove(self.user_filter.final_name)
+            print(self.user_list)
+            self.user_filter.top.destroy()
+        else:
+            self.top.after(100, lambda: self.await_new_user())
+
+    def list_to_stringvar(self, lst) -> tk.StringVar:
+        strvar = ''
+        for item in lst:
+            strvar += str(item) + " "
+        strvar = strvar[:-1]
+        listvar = tk.StringVar(value=strvar)
+        print(listvar.get())
+        return listvar
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

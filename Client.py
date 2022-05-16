@@ -1,3 +1,4 @@
+import ast
 import hashlib
 import json
 import logging
@@ -18,7 +19,8 @@ class User:
         self.my_socket.connect((ip, port))
         self.success = False  # Whether the User Connection was successful
         self.drawing = 0  # Whether or not we are in drawing mode
-
+        self.changed = 0  # Whether the client name list was updated
+        self.client_name_list = []
         # Encypt password for security purposes
         hash_object = hashlib.md5(Password.encode())
         md5_hash = hash_object.hexdigest()
@@ -35,6 +37,15 @@ class User:
             self.success = True
         print("Client Creation Successfull")
         self.my_socket.close()
+
+    def get_connected_Clients(self):
+        self.my_socket.send("L".encode())
+
+    def parse_connected_clients(self, clients_string: str):
+        clients_string = clients_string[1:]
+        print("Clients_string:"+clients_string)
+        self.client_name_list = ast.literal_eval(clients_string)
+        self.changed = 1
 
     def inquire_lobby(self, lobby_id):
         # Ask the main server if The lobby exists, and if it does, connect to it
@@ -70,9 +81,10 @@ class User:
 
 
 class Lobby:
-    def __init__(self, lobby_name, priv_or_publ):
+    def __init__(self, lobby_name, priv_or_publ, client_name):
         self.name = lobby_name
         self.security_status = priv_or_publ
+        self.client_name = client_name
         self.users = []
         self.data = []
         self.rlist = []
@@ -103,7 +115,6 @@ class Lobby:
     def newclient(self, current_socket: socket.socket, client_sockets):
         if not self.security_status:
             connection, client_address = current_socket.accept()
-
             self.socket_address_map[connection] = client_address
             connection.send("yes".encode())
             logging.info("New client joined!")
@@ -130,16 +141,23 @@ class Lobby:
                 socket_address = self.socket_address_map[current_socket]
                 self.connected_users[params] = socket_address[0]
                 print("User " + params + " Added to user list")
+            if command == "L":  # A client requested all the names of all clients connected to us
+                current_socket.send(("L" + self.send_names()).encode())
             if command == "D":  # A client drew a drawing, send it to all other clients
                 self.update_clients(params)
 
-    def get_gui_drawing(self, gui_drawing):
-        self.gui_drawing = gui_drawing
+    def send_names(self):
+        user_names = list(self.connected_users.keys())
+        user_names.append(self.client_name)
+        user_names = list(dict.fromkeys(user_names))
+        return str(user_names)
+
+    def get_data(self):
+        return self.data
 
     def update_clients(self, drawing_string):
         drawing = json.loads(drawing_string)
         self.data += drawing
-        self.gui_drawing += drawing
         self.send_to_everyone(drawing_string)
 
     def check_popup(self, t, current_socket, root, connection_address):

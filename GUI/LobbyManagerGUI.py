@@ -159,7 +159,7 @@ class Toplevel1(GUI):
         self.widgets.append(self.StartSessionButton)
 
     def initiate_lobby(self, lobby_name, lobby_security):
-        self.lobby = Client.Lobby(lobby_name=lobby_name, priv_or_publ=lobby_security)
+        self.lobby = Client.Lobby(lobby_name=lobby_name, priv_or_publ=lobby_security, client_name=self.client.Username)
         self.top.after(1000, self.run_lobby_loop)
 
     def run_lobby_loop(self):

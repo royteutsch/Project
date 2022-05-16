@@ -11,6 +11,7 @@ import tkinter.ttk as ttk
 from tkinter.constants import *
 
 # import ColourAddGUI_support
+from typing import Tuple
 
 
 class Toplevel1:
@@ -229,14 +230,14 @@ class Toplevel1:
 
         self.apply_colour()
 
-    def hex_to_rgb(self, hex) -> tuple[int, ...]:
+    def hex_to_rgb(self, hex) -> Tuple[int, ...]:
         rgb = []
         for i in (0, 2, 4):
             decimal = int(hex[i:i + 2], 16)
             rgb.append(decimal)
         return tuple(rgb)
 
-    def rgb_to_hex(self, rgb: tuple[int, int, int]) -> str:
+    def rgb_to_hex(self, rgb: Tuple[int, int, int]) -> str:
         print(str(rgb))
         print('#'+'%02x%02x%02x' % rgb)
         return '#' + '%02x%02x%02x' % rgb

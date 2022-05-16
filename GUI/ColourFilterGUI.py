@@ -12,11 +12,15 @@ from tkinter.constants import *
 
 
 # import ColourFilterGUI_support
+from GUI import ColourFilterAddGUI
+
 
 class Toplevel1:
-    def __init__(self, top=None):
+    def __init__(self, top=None, current_colours=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
+        if current_colours is None:
+            current_colours = []
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -38,42 +42,14 @@ class Toplevel1:
         top.configure(background="#d9d9d9")
 
         self.top = top
-        self.selectedButton = tk.IntVar()
-
-        self.WhiteListButton = tk.Radiobutton(self.top)
-        self.WhiteListButton.place(relx=0.0, rely=0.032, relheight=0.08
-                                   , relwidth=0.476)
-        self.WhiteListButton.configure(activebackground="#ececec")
-        self.WhiteListButton.configure(activeforeground="#000000")
-        self.WhiteListButton.configure(anchor='w')
-        self.WhiteListButton.configure(background="#d9d9d9")
-        self.WhiteListButton.configure(compound='left')
-        self.WhiteListButton.configure(disabledforeground="#a3a3a3")
-        self.WhiteListButton.configure(foreground="#000000")
-        self.WhiteListButton.configure(highlightbackground="#d9d9d9")
-        self.WhiteListButton.configure(highlightcolor="black")
-        self.WhiteListButton.configure(justify='left')
-        self.WhiteListButton.configure(text='''W''')
-        self.WhiteListButton.configure(variable=self.selectedButton)
-
-        self.BlackListButton = tk.Radiobutton(self.top)
-        self.BlackListButton.place(relx=0.485, rely=0.032, relheight=0.08
-                                   , relwidth=0.52)
-        self.BlackListButton.configure(activebackground="#ececec")
-        self.BlackListButton.configure(activeforeground="#000000")
-        self.BlackListButton.configure(anchor='w')
-        self.BlackListButton.configure(background="#d9d9d9")
-        self.BlackListButton.configure(compound='left')
-        self.BlackListButton.configure(disabledforeground="#a3a3a3")
-        self.BlackListButton.configure(foreground="#000000")
-        self.BlackListButton.configure(highlightbackground="#d9d9d9")
-        self.BlackListButton.configure(highlightcolor="black")
-        self.BlackListButton.configure(justify='left')
-        self.BlackListButton.configure(text='''B''')
-        self.BlackListButton.configure(variable=self.selectedButton)
+        if current_colours is not None:
+            self.colour_list = current_colours  # A list of all colours that we put in
+        else:
+            self.colour_list = []
+        self.listvar = tk.StringVar()
 
         self.ColourBox = ScrolledListBox(self.top)
-        self.ColourBox.place(relx=0.0, rely=0.16, relheight=0.623
+        self.ColourBox.place(relx=0.0, rely=0.06, relheight=0.723
                              , relwidth=0.974)
         self.ColourBox.configure(background="white")
         self.ColourBox.configure(cursor="xterm")
@@ -84,6 +60,7 @@ class Toplevel1:
         self.ColourBox.configure(highlightcolor="#d9d9d9")
         self.ColourBox.configure(selectbackground="blue")
         self.ColourBox.configure(selectforeground="white")
+        self.ColourBox.configure(listvariable=self.listvar)
 
         self.AddColourButton = tk.Button(self.top)
         self.AddColourButton.place(relx=0.0, rely=0.799, height=64, width=227)
@@ -98,7 +75,39 @@ class Toplevel1:
         self.AddColourButton.configure(highlightcolor="black")
         self.AddColourButton.configure(pady="0")
         self.AddColourButton.configure(text='''Add''')
+        self.AddColourButton.configure(command=lambda: self.get_new_colour())
+        self.top.after(100, lambda: self.update_listvar())
 
+    def update_listvar(self):
+        self.listvar = self.list_to_stringvar(self.colour_list)
+        self.ColourBox.configure(listvariable=self.listvar)
+        self.top.after(100, lambda: self.update_listvar())
+
+    def list_to_stringvar(self, lst) -> tk.StringVar:
+        strvar = ''
+        for item in lst:
+            strvar += str(item) + " "
+        strvar = strvar[:-1]
+        listvar = tk.StringVar(value=strvar)
+        print(listvar.get())
+        return listvar
+
+    def get_new_colour(self):
+        to = tk.Toplevel(self.top)
+        self.colour_filter = ColourFilterAddGUI.Toplevel1(top=to)
+        self.top.after(100, lambda: self.await_new_colour())
+
+    def await_new_colour(self):
+        if self.colour_filter.final_colour != '':
+            print(self.colour_filter.final_colour)
+            if self.colour_filter.final_colour not in self.colour_list:
+                self.colour_list.append(self.colour_filter.final_colour)
+            else:
+                self.colour_list.remove(self.colour_filter.final_colour)
+            print(self.colour_list)
+            self.colour_filter.top.destroy()
+        else:
+            self.top.after(100, lambda: self.await_new_colour())
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):
