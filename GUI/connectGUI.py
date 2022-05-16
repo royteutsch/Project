@@ -82,6 +82,7 @@ class Toplevel1(GUI):
     def connect_to_lobby(self):
         connection_succesful = self.Client.inquire_lobby(str(self.ID.get()).zfill(12))
         if connection_succesful:
+            print("Connection Successful")
             self.replaceGUI(LobbyWaitGUI, self.top, [self.Client, self.ID.get()])
         else:
             t = tk.Toplevel(self.top)

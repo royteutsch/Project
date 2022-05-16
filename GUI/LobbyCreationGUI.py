@@ -42,7 +42,7 @@ class Toplevel1(GUI):
         self.top = top
         self.tch48 = tk.IntVar()
 
-        self.lobbyName  = tk.StringVar()
+        self.lobbyName = tk.StringVar()
         self.lobbySec = tk.IntVar()
         self.Client = params[0]
 
@@ -94,8 +94,8 @@ class Toplevel1(GUI):
         self.LobbyCreationButton.configure(highlightcolor="black")
         self.LobbyCreationButton.configure(pady="0")
         self.LobbyCreationButton.configure(text='''Create''')
-        self.LobbyCreationButton.configure(command=lambda: self.replaceGUI(LobbyManagerGUI, self.top,
-                                                                           [self.lobbyName, self.lobbySec, self.Client]))
+        self.LobbyCreationButton.configure(command=lambda: self.replaceGUI(LobbyManagerGUI, self.top, [self.lobbyName,
+                                                                self.lobbySec, self.Client]))
         self.widgets.append(self.LobbyCreationButton)
 
 if __name__ == '__main__':

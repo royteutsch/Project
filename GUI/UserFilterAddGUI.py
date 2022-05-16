@@ -13,7 +13,7 @@ from tkinter.constants import *
 # import UserFilterAddGUI_support
 
 class Toplevel1:
-    def __init__(self, top=None):
+    def __init__(self, top=None, users=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -37,6 +37,14 @@ class Toplevel1:
         top.configure(background="#d9d9d9")
 
         self.top = top
+        if users is not None:
+            self.user_list = users  # A list of all users that we put in
+        else:
+            self.user_list = []
+
+        self.listvar = self.list_to_stringvar(self.user_list)
+        self.name_of_chosen = tk.StringVar()
+        self.final_name = ""
 
         self.UserListBox = ScrolledListBox(self.top)
         self.UserListBox.place(relx=0.0, rely=0.0, relheight=0.793
@@ -50,6 +58,7 @@ class Toplevel1:
         self.UserListBox.configure(highlightcolor="#d9d9d9")
         self.UserListBox.configure(selectbackground="blue")
         self.UserListBox.configure(selectforeground="white")
+        self.UserListBox.configure(listvariable=self.listvar)
 
         self.UserNameLabel = tk.Label(self.top)
         self.UserNameLabel.place(relx=0.0, rely=0.807, height=61, width=84)
@@ -69,6 +78,7 @@ class Toplevel1:
         self.UserNameEntry.configure(font="TkFixedFont")
         self.UserNameEntry.configure(foreground="#000000")
         self.UserNameEntry.configure(insertbackground="black")
+        self.UserNameEntry.configure(textvariable=self.name_of_chosen)
 
         self.UserNameAddButton = tk.Button(self.top)
         self.UserNameAddButton.place(relx=0.766, rely=0.807, height=64
@@ -78,12 +88,33 @@ class Toplevel1:
         self.UserNameAddButton.configure(background="#d9d9d9")
         self.UserNameAddButton.configure(compound='left')
         self.UserNameAddButton.configure(disabledforeground="#a3a3a3")
-        self.UserNameAddButton.configure(font="-family {David} -size 24")
+        self.UserNameAddButton.configure(font="-family {David} -size 14")
         self.UserNameAddButton.configure(foreground="#000000")
         self.UserNameAddButton.configure(highlightbackground="#d9d9d9")
         self.UserNameAddButton.configure(highlightcolor="black")
         self.UserNameAddButton.configure(pady="0")
-        self.UserNameAddButton.configure(text='''Add''')
+        self.UserNameAddButton.configure(text='''Add/Remove''')
+        self.UserNameAddButton.configure(command=lambda :self.decide_on_name())
+
+    def list_to_stringvar(self, lst) -> tk.StringVar:
+        strvar = ''
+        for item in lst:
+            strvar += str(item) + " "
+        strvar = strvar[:-1]
+        listvar = tk.StringVar(value=strvar)
+        print(listvar.get())
+        return listvar
+
+    def decide_on_name(self):
+        if self.name_of_chosen.get() in self.user_list:
+            self.final_name = self.name_of_chosen.get()
+        else:
+            t = tk.Toplevel(self.top)
+            t.geometry("232x191+660+210")
+            t.title("Popup")
+            t.resizable(0, 0)
+            tk.Label(t, text="Invalid user!", font=('-family {David} -size 20 -weight bold')).place(x=40, y=80)
+            pass
 
 # The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll(object):

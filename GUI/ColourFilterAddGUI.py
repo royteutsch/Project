@@ -11,6 +11,8 @@ import tkinter.ttk as ttk
 from tkinter.constants import *
 
 # import ColourFilterAddGUI_support
+from typing import Tuple
+
 
 class Toplevel1:
     def __init__(self, top=None):
@@ -18,24 +20,30 @@ class Toplevel1:
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
+        _compcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _ana1color = '#d9d9d9'  # X11 color: 'gray85'
+        _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
         top.geometry("480x149+650+467")
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
-        top.resizable(1,  1)
+        top.resizable(1, 1)
         top.title("Add Colour")
         top.configure(background="#d9d9d9")
 
         self.top = top
+        self.colour_rgb = (255, 255, 255)
+        self.colour_hex = '#000000'
+        self.colourR = tk.StringVar(value=255)
+        self.colourG = tk.StringVar(value=255)
+        self.colourB = tk.StringVar(value=255)
+        self.final_colour = ''
 
         self.AddColourFilterLabel = tk.Label(self.top)
         self.AddColourFilterLabel.place(relx=0.021, rely=0.067, height=101
-                , width=454)
+                                        , width=454)
         self.AddColourFilterLabel.configure(anchor='w')
-        self.AddColourFilterLabel.configure(background="#d9d9d9")
+        self.AddColourFilterLabel.configure(background='#d9d9d9')
         self.AddColourFilterLabel.configure(compound='left')
         self.AddColourFilterLabel.configure(disabledforeground="#a3a3a3")
         self.AddColourFilterLabel.configure(font="-family {David} -size 24")
@@ -44,34 +52,37 @@ class Toplevel1:
 
         self.FilterRValueEntry = tk.Entry(self.top)
         self.FilterRValueEntry.place(relx=0.063, rely=0.201, height=60
-                , relwidth=0.092)
+                                     , relwidth=0.092)
         self.FilterRValueEntry.configure(background="white")
         self.FilterRValueEntry.configure(disabledforeground="#a3a3a3")
         self.FilterRValueEntry.configure(font="TkFixedFont")
         self.FilterRValueEntry.configure(foreground="#000000")
         self.FilterRValueEntry.configure(insertbackground="black")
+        self.FilterRValueEntry.configure(textvariable=self.colourR)
 
         self.FilterGValueEntry = tk.Entry(self.top)
         self.FilterGValueEntry.place(relx=0.208, rely=0.201, height=60
-                , relwidth=0.092)
+                                     , relwidth=0.092)
         self.FilterGValueEntry.configure(background="white")
         self.FilterGValueEntry.configure(disabledforeground="#a3a3a3")
         self.FilterGValueEntry.configure(font="TkFixedFont")
         self.FilterGValueEntry.configure(foreground="#000000")
         self.FilterGValueEntry.configure(insertbackground="black")
+        self.FilterGValueEntry.configure(textvariable=self.colourG)
 
         self.FilterBValueEntry = tk.Entry(self.top)
         self.FilterBValueEntry.place(relx=0.354, rely=0.201, height=60
-                , relwidth=0.092)
+                                     , relwidth=0.092)
         self.FilterBValueEntry.configure(background="white")
         self.FilterBValueEntry.configure(disabledforeground="#a3a3a3")
         self.FilterBValueEntry.configure(font="TkFixedFont")
         self.FilterBValueEntry.configure(foreground="#000000")
         self.FilterBValueEntry.configure(insertbackground="black")
+        self.FilterBValueEntry.configure(textvariable=self.colourB)
 
         self.FilterColourPreview = tk.Canvas(self.top)
         self.FilterColourPreview.place(relx=0.667, rely=0.134, relheight=0.557
-                , relwidth=0.194)
+                                       , relwidth=0.194)
         self.FilterColourPreview.configure(background="#d9d9d9")
         self.FilterColourPreview.configure(borderwidth="2")
         self.FilterColourPreview.configure(insertbackground="black")
@@ -79,13 +90,65 @@ class Toplevel1:
         self.FilterColourPreview.configure(selectbackground="blue")
         self.FilterColourPreview.configure(selectforeground="white")
 
-#def start_up():
+        self.ColourAddButton = tk.Button(self.top)
+        self.ColourAddButton.place(relx=0.063, rely=0.671, height=44, width=187)
+        self.ColourAddButton.configure(activebackground="#ececec")
+        self.ColourAddButton.configure(activeforeground="#000000")
+        self.ColourAddButton.configure(background="#d9d9d9")
+        self.ColourAddButton.configure(compound='left')
+        self.ColourAddButton.configure(disabledforeground="#a3a3a3")
+        self.ColourAddButton.configure(font="-family {David} -size 24")
+        self.ColourAddButton.configure(foreground="#000000")
+        self.ColourAddButton.configure(highlightbackground="#d9d9d9")
+        self.ColourAddButton.configure(highlightcolor="black")
+        self.ColourAddButton.configure(pady="0")
+        self.ColourAddButton.configure(text='''Add/Remove''')
+        self.ColourAddButton.configure(command=lambda: self.decide_on_colour())
+
+        self.top.after(100, lambda: self.update_colour())
+
+    def regulate_colours(self):
+        if int(self.colourR.get()) > 255:
+            self.colourR.set(value=255)
+        if int(self.colourR.get()) < 0:
+            self.colourR.set(value=0)
+        if int(self.colourG.get()) > 255:
+            self.colourG.set(value=255)
+        if int(self.colourG.get()) < 0:
+            self.colourG.set(value=0)
+        if int(self.colourB.get()) > 255:
+            self.colourB.set(value=255)
+        if int(self.colourB.get()) < 0:
+            self.colourB.set(value=0)
+
+    def rgb_to_hex(self, rgb: Tuple[int, int, int]) -> str:
+        return '#' + '%02x%02x%02x' % rgb
+
+    def is_num(self, maybe_num):
+        try:
+            int(maybe_num.get())
+            return True
+        except ValueError:
+            return False
+
+    def update_colour(self):
+        if self.is_num(self.colourR) and self.is_num(self.colourG) and self.is_num(self.colourB):
+            self.regulate_colours()
+            self.colour_rgb = (int(self.colourR.get()), int(self.colourG.get()), int(self.colourB.get()))
+            self.colour_hex = self.rgb_to_hex(self.colour_rgb)
+            self.FilterColourPreview.configure(background=self.colour_hex)
+        self.top.after(100, lambda: self.update_colour())
+
+    def decide_on_colour(self):
+        if self.is_num(self.colourR) and self.is_num(self.colourG) and self.is_num(self.colourB):
+            self.regulate_colours()
+            self.colour_rgb = (int(self.colourR.get()), int(self.colourB.get()), int(self.colourG.get()))
+            self.final_colour = self.rgb_to_hex(self.colour_rgb)
+
+# def start_up():
 #     ColourFilterAddGUI_support.main()
 
 if __name__ == '__main__':
     root = tk.Tk()
     t = Toplevel1(root)
     root.mainloop()
-
-
-

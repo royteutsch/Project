@@ -1,4 +1,6 @@
+import ast
 import hashlib
+import json
 import logging
 import select
 import socket
@@ -16,7 +18,9 @@ class User:
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect((ip, port))
         self.success = False  # Whether the User Connection was successful
-
+        self.drawing = 0  # Whether or not we are in drawing mode
+        self.changed = 0  # Whether the client name list was updated
+        self.client_name_list = []
         # Encypt password for security purposes
         hash_object = hashlib.md5(Password.encode())
         md5_hash = hash_object.hexdigest()
@@ -33,6 +37,15 @@ class User:
             self.success = True
         print("Client Creation Successfull")
         self.my_socket.close()
+
+    def get_connected_Clients(self):
+        self.my_socket.send("L".encode())
+
+    def parse_connected_clients(self, clients_string: str):
+        clients_string = clients_string[1:]
+        print("Clients_string:"+clients_string)
+        self.client_name_list = ast.literal_eval(clients_string)
+        self.changed = 1
 
     def inquire_lobby(self, lobby_id):
         # Ask the main server if The lobby exists, and if it does, connect to it
@@ -58,11 +71,20 @@ class User:
         else:
             return False
 
+    def wait_for_lobby(self):
+        # Requires Connection to Lobby. Waits until lobby sends "D" for drawing and changes to drawing mode
+        self.rlist, wlist, xlist = select.select([self.my_socket], [], [], 0.1)
+        for current_socket in self.rlist:
+            confirmation = current_socket.recv(1024).decode()
+            if confirmation == "D":
+                self.drawing = 1
+
 
 class Lobby:
-    def __init__(self, lobby_name, priv_or_publ):
+    def __init__(self, lobby_name, priv_or_publ, client_name):
         self.name = lobby_name
         self.security_status = priv_or_publ
+        self.client_name = client_name
         self.users = []
         self.data = []
         self.rlist = []
@@ -70,6 +92,7 @@ class Lobby:
         self.my_socket.connect((ip, port))
         self.my_socket.send("L".encode())
         self.id = self.my_socket.recv(512).decode()
+        self.bg_file_destination = ''
 
         print("Finished making lobby credentials")
         # Setting up the mini server
@@ -86,8 +109,6 @@ class Lobby:
         self.connected_users = {}
         self.socket_address_map = {}
 
-
-
     def print_client_sockets(self, client_sockets):
         for i in range(len(client_sockets)):
             logging.debug(client_sockets[i])
@@ -95,9 +116,8 @@ class Lobby:
     def newclient(self, current_socket: socket.socket, client_sockets):
         if not self.security_status:
             connection, client_address = current_socket.accept()
-
             self.socket_address_map[connection] = client_address
-
+            connection.send("yes".encode())
             logging.info("New client joined!")
             client_sockets.append(connection)
             self.print_client_sockets(client_sockets)
@@ -122,7 +142,24 @@ class Lobby:
                 socket_address = self.socket_address_map[current_socket]
                 self.connected_users[params] = socket_address[0]
                 print("User " + params + " Added to user list")
-            # TODO: ADD RECEIVING DRAWINGS AND ADDING TO DATA USING PROCEDURE FOR LONG MESSAGE RECEIVES
+            if command == "L":  # A client requested all the names of all clients connected to us
+                current_socket.send(("L" + self.send_names()).encode())
+            if command == "D":  # A client drew a drawing, send it to all other clients
+                self.update_clients(params)
+
+    def send_names(self):
+        user_names = list(self.connected_users.keys())
+        user_names.append(self.client_name)
+        user_names = list(dict.fromkeys(user_names))
+        return str(user_names)
+
+    def get_data(self):
+        return self.data
+
+    def update_clients(self, drawing_string):
+        drawing = json.loads(drawing_string)
+        self.data += drawing
+        self.send_to_everyone(drawing_string)
 
     def check_popup(self, t, current_socket, root, connection_address):
         if t.confirm == 0:  # Lobby manager did not allow the user to join
@@ -147,6 +184,18 @@ class Lobby:
         t = GUI.UserPromptGUI.Toplevel1(username=username, top=root)
         root.after(100, lambda: self.check_popup(t, current_socket, root, connection_address))
 
+    def send_bg_file(self, file_dest):
+        """self.bg_file_destination = file_dest
+        bg_file = open(self.bg_file_destination, 'rb')
+        message = str(bg_file.read())
+        length = str(len(message))
+        print(length)
+        length_of_length = str(len(length)).zfill(4)
+        final_message = "B" + length_of_length + length + message
+        print("Bg: " + self.bg_file_destination)
+        self.send_to_everyone(final_message)"""
+        pass
+
     def one_loop(self):
         print("main looping")
         self.rlist, wlist, xlist = select.select([self.server_socket] + self.client_sockets, [], [], 0.1)
@@ -162,3 +211,9 @@ class Lobby:
             if current_socket in wlist:
                 current_socket.send(data.encode())
                 self.messages_to_send.remove(message)
+
+    def send_to_everyone(self, message: str):
+        # Sends Message to all clients
+        print("Message: "+message+" Sent to Everyone")
+        for current_socket in self.client_sockets:
+            current_socket.send(message.encode())
