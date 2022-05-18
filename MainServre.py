@@ -19,6 +19,7 @@ class Server:
         logging.info("Listening for clients...")
         self.client_sockets = []
         self.active_lobbies = {}  # The dict is structured as {lobby ID : lobby IP}
+        self.num_of_unnamed_files = 0
         messages_to_send = []
         # place for parameters
 
@@ -74,7 +75,7 @@ class Server:
                 client.send("no".encode())
 
     def client_messege(self, current_socket: socket.socket):
-        command = current_socket.recv(1024).decode()  # get the request the client wants us to do
+        command = current_socket.recv(1).decode()  # get the request the client wants us to do
         print("command: " + str(command))
         if command == "":  # Client wants to leave
             print("Connection closed with client")
@@ -82,11 +83,30 @@ class Server:
             self.rlist.remove(current_socket)
             current_socket.close()
         else:
-            directive = command[0]
-            print("directive: " + directive)
-            command = command[1:]
-            print("command: " + command)
+            directive = command
             # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE), "F" (END OF LOBBY, GET THE ARCHIVE "F"ILE)
+            if directive == "F":  # A lobby has just ended, create an archive file
+                length_of_lengths = current_socket.recv(4).decode()
+                message_length = int(current_socket.recv(int(length_of_lengths)).decode())
+                temp_name = str(self.num_of_unnamed_files) + ".txt"
+                self.num_of_unnamed_files += 1
+                soon_to_be_file = ""
+                f = open(temp_name, 'wb')
+                f.write(''.encode())
+                f.close()
+                f = open(temp_name, 'ab')
+                while not message_length == 0:
+                    if message_length <= 9999:
+                        data = current_socket.recv(message_length).decode()
+                        soon_to_be_file += data
+                        f.write(data.encode())
+                        break
+                    data = current_socket.recv(9999).decode()
+                    soon_to_be_file += data
+                    f.write(data.encode())
+                    print("handling...")
+                    message_length -= 9999
+                f.close()
             if directive == "L":  # A new lobby has just sent this, send back a unique id for it
                 current_socket.send(str(self.lobby_id).zfill(12).encode())
                 socket_address = self.socket_address_map[current_socket]
@@ -94,16 +114,16 @@ class Server:
                 self.active_lobbies[str(self.lobby_id).zfill(12)] = socket_address[0]
                 self.lobby_id += 1
             if directive == "C":  # A client is trying to log in, check if He exists in the Database
-                params = command.split("|")
+                params = current_socket.recv(1024).decode().split("|")
                 print("params: " + str(params))
                 print("Checking client info")
                 self.check_client_info(params, current_socket)
             if directive == "I":  # Check if the lobby exists, if it does, send the ip address. If not, send "-1"
-
-                print(command)
+                params = current_socket.recv(1024).decode()
+                print(params)
                 print(self.active_lobbies)
-                if command in self.active_lobbies:
-                    current_socket.send(self.active_lobbies[command].encode())
+                if params in self.active_lobbies:
+                    current_socket.send(self.active_lobbies[params].encode())
                 else:
                     current_socket.send("-1".encode())
 

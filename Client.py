@@ -212,6 +212,18 @@ class Lobby:
                 current_socket.send(data.encode())
                 self.messages_to_send.remove(message)
 
+    def exit_protocol(self):
+        print("Closing sockets")
+        for client_socket in self.client_sockets:
+            client_socket.close()
+        print("sending archive to server")
+        message = "["+self.name+"],"+json.dumps(self.data)
+        length = str(len(message))
+        length_of_length = str(len(length)).zfill(4)
+        final_message = "F" + length_of_length + length + message
+        self.my_socket.send(final_message.encode())
+        print("goodbye")
+
     def send_to_everyone(self, message: str):
         # Sends Message to all clients
         print("Message: "+message+" Sent to Everyone")

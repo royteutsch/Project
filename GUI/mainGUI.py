@@ -11,9 +11,9 @@ import time
 import tkinter
 import tkinter as tk
 import json
-from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPDF, renderPM
-from PIL import Image, ImageTk
+# from svglib.svglib import svg2rlg
+# from reportlab.graphics import renderPDF, renderPM
+# from PIL import Image, ImageTk
 
 
 
@@ -438,9 +438,14 @@ class Toplevel1:
             self.top.after(100, lambda: self.client_update())
         else:
             self.name = self.net.client_name
+            self.top.protocol("WM_DELETE_WINDOW", lambda : self.exit_protocol())
             """if self.net.bg_file_destination != '':
                 self.set_as_bg(self.net.bg_file_destination)"""
             self.top.after(100, lambda: self.lobby_update())
+
+    def exit_protocol(self):
+        self.net.exit_protocol()
+        self.top.destroy()
 
     def change_filters(self, time, colour, user):
         # updates self.blacklist
