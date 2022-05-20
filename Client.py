@@ -217,7 +217,13 @@ class Lobby:
         for client_socket in self.client_sockets:
             client_socket.close()
         print("sending archive to server")
-        message = "["+self.name+"],"+json.dumps(self.data)
+        # Remove duplicates from self.data
+        new_data = []
+        for drawing in self.data:
+            if drawing not in new_data:
+                new_data.append(drawing)
+        new_data.insert(0, [self.name])
+        message = json.dumps(new_data)
         length = str(len(message))
         length_of_length = str(len(length)).zfill(4)
         final_message = "F" + length_of_length + length + message

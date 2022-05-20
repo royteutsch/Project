@@ -1,3 +1,5 @@
+import json
+import os
 import select
 import logging
 import socket
@@ -88,7 +90,7 @@ class Server:
             if directive == "F":  # A lobby has just ended, create an archive file
                 length_of_lengths = current_socket.recv(4).decode()
                 message_length = int(current_socket.recv(int(length_of_lengths)).decode())
-                temp_name = str(self.num_of_unnamed_files) + ".txt"
+                temp_name = "database/" + str(self.num_of_unnamed_files) + ".txt"
                 self.num_of_unnamed_files += 1
                 soon_to_be_file = ""
                 f = open(temp_name, 'wb')
@@ -107,6 +109,7 @@ class Server:
                     print("handling...")
                     message_length -= 9999
                 f.close()
+                self.handle_file(temp_name)
             if directive == "L":  # A new lobby has just sent this, send back a unique id for it
                 current_socket.send(str(self.lobby_id).zfill(12).encode())
                 socket_address = self.socket_address_map[current_socket]
@@ -126,6 +129,23 @@ class Server:
                     current_socket.send(self.active_lobbies[params].encode())
                 else:
                     current_socket.send("-1".encode())
+
+    def handle_file(self, temp_file_name):
+        """
+        Renames the file to an appropriate name and adds \n after each object in the list
+        :param temp_file_name: The temporary name of the file in question, will be renamed to its entered name
+        """
+        file = open(temp_file_name, 'r')
+        list_string = file.read()
+        file.close()
+        drawing_list = json.loads(list_string)
+        print(drawing_list)
+        os.rename(temp_file_name, "database/" + str(drawing_list[0][0]) + ".txt")
+        self.num_of_unnamed_files -= 1
+        file = open("database/" + str(drawing_list[0][0]) + ".txt", 'w')
+        for drawing in drawing_list:
+            file.write(str(drawing) + "\n")
+        file.close()
 
 def main():
     server = Server()
