@@ -86,7 +86,7 @@ class Server:
             current_socket.close()
         else:
             directive = command
-            # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE), "F" (END OF LOBBY, GET THE ARCHIVE "F"ILE)
+            # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE)
             if directive == "F":  # A lobby has just ended, create an archive file
                 length_of_lengths = current_socket.recv(4).decode()
                 message_length = int(current_socket.recv(int(length_of_lengths)).decode())
