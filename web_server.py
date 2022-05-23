@@ -6,11 +6,40 @@ Async Explanation: https://www.aeracode.org/2018/02/19/python-async-simplified/
 """
 import websockets
 import asyncio
+import pickle
 
 class webserver:
 
+    def check_client_info(self, params):
+        print("Client params: " + str(params))
+        cUsername = params[0]
+        cPassword = params[1]
+
+        client_infos = open("client_info.txt", "rb")
+        client_database = pickle.load(client_infos)
+        print("Client Database: " + str(client_database))
+        if cUsername not in client_database:
+            print("Client does not exist")
+            return "Cn"
+        else:
+            if client_database[cUsername] == cPassword:
+                print("Client exists")
+                return "Cy"
+            else:
+                print("Client does not exist")
+                return "Cn"
+
     async def respond_to_web_message(self, message):
-        return "message: " + message + ". Received"
+        print(message)
+        directive = message[0]
+        print(directive)
+        if directive == "C":  # A client is trying to log in, check if He exists in the Database
+            params = message[1:].split("|")
+            print("params: " + str(params))
+            print("Checking client info")
+            return self.check_client_info(params)
+        else:
+            return "message: " + message + ". Received"
 
     async def handler(self, websocket, path):
         async for request in websocket:
@@ -26,6 +55,7 @@ class webserver:
 
 def main():
     server = webserver()
+
 
 if __name__ == '__main__':
     main()
