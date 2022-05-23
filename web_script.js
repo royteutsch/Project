@@ -22,7 +22,11 @@ web_server.onmessage = function(event){
             sessionStorage.setItem("user_name", "None");   
             location.href="web_main.html";
         } // Both send the website back to the home page
-    }   
+    }
+    if (directive == "S") {  // We tried to create a user and it has "S"uccessufully relayed it to the main server, go back to the main page
+        sessionStorage.setItem("user_name", "None");
+        location.href="web_main.html";
+    }
 };
 
 function send(){
@@ -48,7 +52,22 @@ function connect(){
     }
     console.log("Msg sent", message);
     }
-    
+
+function create(){
+    var new_username = document.getElementById("create_user_name_entry").value;
+    var new_password = document.getElementById("create_user_pass_entry").value;
+    var new_enc_pass = md5(new_password);
+    username = new_username;
+    message = "M" + new_username + "|" + new_enc_pass;
+    try {
+        web_server.send(message);
+    } catch {
+
+    }
+    console.log("Msg sent", message);
+    sessionStorage.setItem("user_name", "None");
+}
+
 /*
     The Following is the md5 encryption function. No other way besides directely including it in the js file has worked for me
 */

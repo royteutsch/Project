@@ -57,19 +57,34 @@ class Server:
         client_sockets.append(connection)
         self.print_client_sockets(client_sockets)
 
-    def check_client_info(self, params, client):
-        print("Client params: " + str(params))
-        cUsername = params[0]
-        cPassword = params[1]
+    def create_account(self, params):
+        c_username = params[0]
+        c_password = params[1]
 
         client_infos = open("client_info.txt", "rb")
         client_database = pickle.load(client_infos)
         print("Client Database: " + str(client_database))
-        if cUsername not in client_database:
+        if c_username not in client_database:  # we will create an account only when the name is not taken
+            client_database[c_username] = c_password
+            client_infos.close()
+            client_infos = open("client_info.txt", "wb")
+            pickle.dump(client_database, client_infos)
+        client_infos.close()
+
+    def check_client_info(self, params, client):
+        print("Client params: " + str(params))
+        c_username = params[0]
+        c_password = params[1]
+
+        client_infos = open("client_info.txt", "rb")
+        client_database = pickle.load(client_infos)
+        client_infos.close()
+        print("Client Database: " + str(client_database))
+        if c_username not in client_database:
             print("Client does not exist")
             client.send("no".encode())
         else:
-            if client_database[cUsername] == cPassword:
+            if client_database[c_username] == c_password:
                 print("Client exists")
                 client.send("yes".encode())
             else:
@@ -87,6 +102,11 @@ class Server:
         else:
             directive = command
             # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE)
+            if directive == "M":  # The web server asked us to Make a new account
+                params = current_socket.recv(1024).decode().split("|")
+                print("new user params: " + str(params))
+                print("creating account")
+                self.create_account(params)
             if directive == "F":  # A lobby has just ended, create an archive file
                 length_of_lengths = current_socket.recv(4).decode()
                 message_length = int(current_socket.recv(int(length_of_lengths)).decode())
