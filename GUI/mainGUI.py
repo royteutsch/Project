@@ -434,7 +434,7 @@ class Toplevel1:
         self.ParamButton.configure(command=lambda: self.open_brush_params())
         self.update()
         if self.status == "c":
-            self.name = self.net.Username
+            self.name = self.net.username
             self.top.after(100, lambda: self.client_update())
         else:
             self.name = self.net.client_name

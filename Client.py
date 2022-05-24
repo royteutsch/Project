@@ -5,35 +5,34 @@ import logging
 import select
 import socket
 
-import GUI.UserPromptGUI
+import GUI.UserPromptGUI, GUI.ipEntryGUI
 import tkinter as tk
 
 logging.basicConfig(level=logging.DEBUG)
-ip = '127.0.0.1'
-port = 5555
-
 
 class User:
-    def __init__(self, Username, Password):
+    def __init__(self, username, password, ip, port):
+        self.ip = ip
+        self.port = port
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.my_socket.connect((ip, port))
+        self.my_socket.connect((self.ip, self.port))
         self.success = False  # Whether the User Connection was successful
         self.drawing = 0  # Whether or not we are in drawing mode
         self.changed = 0  # Whether the client name list was updated
         self.client_name_list = []
         # Encypt password for security purposes
-        hash_object = hashlib.md5(Password.encode())
+        hash_object = hashlib.md5(password.encode())
         md5_hash = hash_object.hexdigest()
 
         self.my_socket.send(
-            ("C" + Username + "|" + md5_hash).encode())  # Inquires if the username and password are valid
+            ("C" + username + "|" + md5_hash).encode())  # Inquires if the username and password are valid
         print("Checking Client Info")
         confirm = self.my_socket.recv(512).decode().lower()
         print("Client Certificate received: " + confirm)
         if confirm == "yes":
             print("Client is Authentic")
-            self.Username = Username
-            self.Password = Password
+            self.username = username
+            self.password = password
             self.success = True
         print("Client Creation Successfull")
         self.my_socket.close()
@@ -50,7 +49,7 @@ class User:
     def inquire_lobby(self, lobby_id):
         # Ask the main server if The lobby exists, and if it does, connect to it
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.my_socket.connect((ip, port))
+        self.my_socket.connect((self.ip, self.port))
         self.my_socket.send(("I" + str(lobby_id)).encode())
         print("Checking if lobby exists")
         lobby_ip = str(self.my_socket.recv(1024).decode())
@@ -61,7 +60,7 @@ class User:
         if lobby_ip != str(-1):
             self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.my_socket.connect((lobby_ip, 5556))
-            self.my_socket.send(("U" + self.Username).encode())
+            self.my_socket.send(("U" + self.username).encode())
             confirmation = self.my_socket.recv(1024).decode()
             print("Username sent to server")
             if confirmation == "yes":
@@ -81,15 +80,17 @@ class User:
 
 
 class Lobby:
-    def __init__(self, lobby_name, priv_or_publ, client_name):
+    def __init__(self, lobby_name, priv_or_publ, client_name, ip, port):
         self.name = lobby_name
         self.security_status = priv_or_publ
         self.client_name = client_name
+        self.ip = ip
+        self.port = port
         self.users = []
         self.data = []
         self.rlist = []
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.my_socket.connect((ip, port))
+        self.my_socket.connect((self.ip, self.port))
         self.my_socket.send("L".encode())
         self.id = self.my_socket.recv(512).decode()
         self.bg_file_destination = ''

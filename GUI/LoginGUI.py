@@ -18,8 +18,10 @@ from GUI.BaselineGUI import GUI
 
 
 class Toplevel1(GUI):
-    def __init__(self, top=None):
+    def __init__(self, top=None, params=None):
         super(Toplevel1, self).__init__()
+        if params is None:
+            params = []
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -39,6 +41,9 @@ class Toplevel1(GUI):
 
         self.Username = StringVar()
         self.Password = StringVar()
+
+        self.ip = params[0]
+        self.port = params[1]
 
         self.Title = tk.Label(self.top)
         self.Title.place(relx=0.283, rely=0.022, height=61, width=254)
@@ -138,8 +143,8 @@ class Toplevel1(GUI):
         webbrowser.open('file:///' + os.path.dirname(os.getcwd()) + '/' + 'web_main.html'))
         self.widgets.append(self.CreateButton)
 
-    def connect_to_user(self, Username, Password):
-        clientUser = Client.User(Username, Password)
+    def connect_to_user(self, Username, Password, ip, port):
+        clientUser = Client.User(Username, Password, ip, port)
         print(clientUser.success)
         if clientUser.success:  # If the Client was created successfully
             print("Client Creation Successful, switching GUI")
