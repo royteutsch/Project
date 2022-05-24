@@ -27,7 +27,28 @@ web_server.onmessage = function(event){
         sessionStorage.setItem("user_name", "None");
         location.href="web_main.html";
     }
+    if (directive == "D") {  // We asked for the names of all files in the database "D"irectory, display them as buttons
+        var JSON_string = response.slice(1);
+        var list_of_file_names = JSON.parse(JSON_string)
+        for (let index = 0; index < list_of_file_names.length; index++) {
+            var file_name = list_of_file_names[index].slice(0, -4);
+            var element = document.createElement("input");
+            console.log("New Input created")
+            element.setAttribute("type", "button");
+            element.setAttribute("value", file_name);
+            element.setAttribute("onclick", "open_file(this)");
+            document.body.appendChild(element);
+        }
+        var element = document.getElementById("drawing_loading_button");
+        document.body.removeChild(element)
+    }
 };
+
+function open_file(button_clicked){
+    file_name = button_clicked.value
+    sessionStorage.setItem("viewed_file", file_name);
+    location.href="web_view_drawing.html"
+    }
 
 function send(){
     message = document.getElementById("test_entry").value;
@@ -38,8 +59,21 @@ function send(){
     }
     console.log("Msg sent ", message);
     }
-    
+
+function load(){
+    // Asks for the name of all files in the database Directory so we can load them
+    console.log("Asking webserver for database names");
+    message = "D";
+    try {
+        web_server.send(message);
+    } catch {
+
+    }
+    console.log("Msg sent", message);
+    }  
+
 function connect(){
+    // Connects to a client
     username = document.getElementById("login_user_name_entry").value;
     var password = document.getElementById("login_user_pass_entry").value;
     var enc_pass = md5(password);
@@ -54,6 +88,7 @@ function connect(){
     }
 
 function create(){
+    // Creates a client
     var new_username = document.getElementById("create_user_name_entry").value;
     var new_password = document.getElementById("create_user_pass_entry").value;
     var new_enc_pass = md5(new_password);

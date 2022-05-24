@@ -4,6 +4,8 @@ websocket.
 Additionally, I used asyncio for the web server because I could not get it to work without async
 Async Explanation: https://www.aeracode.org/2018/02/19/python-async-simplified/
 """
+import json
+import os
 import socket
 import threading
 
@@ -54,6 +56,10 @@ class webserver:
             print("User details: "+ str(user_details))
             print("Creating account")
             return self.create_account(user_details)
+        if directive == "D":  # A client asked us for the name of every drawing in the "D"atabate directory, send it
+            file_name_list = os.listdir("database")
+            print(file_name_list)
+            return "D"+json.dumps(file_name_list)
         else:
             return "message: " + message + ". Received"
 
@@ -67,6 +73,7 @@ class webserver:
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect((main_server_ip_address, 5555))
         start_server = websockets.serve(self.handler, '0.0.0.0', 5678)
+        print("Starting server")
         asyncio.get_event_loop().run_until_complete(start_server)
         asyncio.get_event_loop().run_forever()
 
