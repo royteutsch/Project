@@ -16,7 +16,6 @@ import json
 # from PIL import Image, ImageTk
 
 
-
 # import mainGUI_support
 from GUI import BrushSelectGUI, ColourFilterGUI, UserFilterGUI
 
@@ -183,7 +182,7 @@ class Toplevel1:
         self.ExplanationLabel.configure(text='''Leave Empty for Present''')
 
         self.TimeFilterCheck = tk.Checkbutton(self.TimeFilterFrame)
-        self.TimeFilterCheck.place(relx=0.069, rely=0.522, relheight=0.217, relwidth = 0.421)
+        self.TimeFilterCheck.place(relx=0.069, rely=0.522, relheight=0.217, relwidth=0.421)
         self.TimeFilterCheck.configure(activebackground="#ececec")
         self.TimeFilterCheck.configure(activeforeground="#000000")
         self.TimeFilterCheck.configure(anchor='w')
@@ -234,10 +233,10 @@ class Toplevel1:
         self.ColourButton.configure(highlightcolor="black")
         self.ColourButton.configure(pady="0")
         self.ColourButton.configure(text='''Choose''')
-        self.ColourButton.configure(command=lambda :self.open_colour_filter())
+        self.ColourButton.configure(command=lambda: self.open_colour_filter())
 
         self.ColourFilterCheck = tk.Checkbutton(self.ColourFilterFrame)
-        self.ColourFilterCheck.place(relx=0.276, rely=0.345, relheight=0.172, relwidth = 0.421)
+        self.ColourFilterCheck.place(relx=0.276, rely=0.345, relheight=0.172, relwidth=0.421)
         self.ColourFilterCheck.configure(activebackground="#ececec")
         self.ColourFilterCheck.configure(activeforeground="#000000")
         self.ColourFilterCheck.configure(anchor='w')
@@ -288,10 +287,10 @@ class Toplevel1:
         self.UserButton.configure(highlightcolor="black")
         self.UserButton.configure(pady="0")
         self.UserButton.configure(text='''Choose''')
-        self.UserButton.configure(command=lambda :self.open_user_filter())
+        self.UserButton.configure(command=lambda: self.open_user_filter())
 
         self.UserFilterCheck = tk.Checkbutton(self.UserFilterFrame)
-        self.UserFilterCheck.place(relx=0.276, rely=0.424, relheight=0.152, relwidth = 0.421)
+        self.UserFilterCheck.place(relx=0.276, rely=0.424, relheight=0.152, relwidth=0.421)
         self.UserFilterCheck.configure(activebackground="#ececec")
         self.UserFilterCheck.configure(activeforeground="#000000")
         self.UserFilterCheck.configure(anchor='w')
@@ -307,7 +306,7 @@ class Toplevel1:
         self.UserFilterCheck.configure(variable=self.user_var)
 
         self.ActivateAllFilter = tk.Checkbutton(self.FilterFrame)
-        self.ActivateAllFilter.place(relx=0.207, rely=0.119, relheight=0.05, relwidth = 0.559)
+        self.ActivateAllFilter.place(relx=0.207, rely=0.119, relheight=0.05, relwidth=0.559)
         self.ActivateAllFilter.configure(activebackground="#ececec")
         self.ActivateAllFilter.configure(activeforeground="#000000")
         self.ActivateAllFilter.configure(anchor='w')
@@ -438,7 +437,7 @@ class Toplevel1:
             self.top.after(100, lambda: self.client_update())
         else:
             self.name = self.net.client_name
-            self.top.protocol("WM_DELETE_WINDOW", lambda : self.exit_protocol())
+            self.top.protocol("WM_DELETE_WINDOW", lambda: self.exit_protocol())
             """if self.net.bg_file_destination != '':
                 self.set_as_bg(self.net.bg_file_destination)"""
             self.top.after(100, lambda: self.lobby_update())
@@ -450,11 +449,11 @@ class Toplevel1:
     def change_filters(self, time, colour, user):
         # updates self.blacklist
         for drawing in self.Drawings:
-            if drawing[0] not in self.blacklist:
+            if not str(drawing) in str(self.blacklist):
                 if time == 1:
                     drawing_time = drawing[4]
                     if len(self.FromEntry.get()) > 0:
-                        print("From time: "+str(self.FromEntry.get()))
+                        print("From time: " + str(self.FromEntry.get()))
                         if drawing_time < float(self.FromEntry.get()):
                             print(str(drawing) + "Added to blacklist")
                             self.blacklist += drawing
@@ -493,14 +492,14 @@ class Toplevel1:
         """
         print("Mouse Clicked")
         if mouse_click == 1:
-            self.mouseCoords += [list((self.top.winfo_pointerx()-self.top.winfo_rootx()-self.Canvas.winfo_x(),
-                                       self.top.winfo_pointery()-self.top.winfo_rooty()-self.Canvas.winfo_y()))]
+            self.mouseCoords += [list((self.top.winfo_pointerx() - self.top.winfo_rootx() - self.Canvas.winfo_x(),
+                                       self.top.winfo_pointery() - self.top.winfo_rooty() - self.Canvas.winfo_y()))]
             if len(self.mouseCoords) == 2 and self.brush != "poly" and self.brush != "lineC":
                 Drawing = [[self.brush, self.colour, self.fill, self.width,
-                            time.time()-self.start, self.name, self.mouseCoords]]
+                            time.time() - self.start, self.name, self.mouseCoords]]
                 Drawing_string = json.dumps(Drawing)
                 if self.status == "c":  # We're a client
-                    self.net.my_socket.send(("D"+Drawing_string).encode())
+                    self.net.my_socket.send(("D" + Drawing_string).encode())
                 else:
                     self.net.update_clients(Drawing_string)
                 self.Drawings += Drawing
@@ -508,7 +507,7 @@ class Toplevel1:
         if mouse_click == 2:
             if self.brush == "poly" or self.brush == "lineC":
                 Drawing = [[self.brush, self.colour, self.fill, self.width,
-                            time.time()-self.start, self.name, self.mouseCoords]]
+                            time.time() - self.start, self.name, self.mouseCoords]]
                 Drawing_string = json.dumps(Drawing)
                 if self.status == "c":  # We're a client
                     self.net.my_socket.send(("D" + Drawing_string).encode())
@@ -521,8 +520,8 @@ class Toplevel1:
         """
         This function renders all drawings in the self.drawings list that arent already drawn
         """
-        print("Blacklist: "+str(self.blacklist))
-        print("Drawn Drawings: "+str(self.drawn_drawings))
+        print("Blacklist: " + str(self.blacklist))
+        print("Drawn Drawings: " + str(self.drawn_drawings))
         if self.all_filter_var.get() == 1:
             self.user_var.set(1)
             self.colour_var.set(1)
@@ -531,11 +530,12 @@ class Toplevel1:
         if self.user_var.get() == 1 or self.colour_var.get() == 1 or self.time_var.get() == 1:
             print("Changing Filters")
             self.change_filters(user=self.user_var.get(), colour=self.colour_var.get(), time=self.time_var.get())
-        self.Drawings = [self.Drawings[x] for x in range(len(self.Drawings)) if not(self.Drawings[x] in self.Drawings[:x])]
+        self.Drawings = [self.Drawings[x] for x in range(len(self.Drawings)) if
+                         not (self.Drawings[x] in self.Drawings[:x])]
         print("Drawing...")
         print(self.Drawings)
         for drawing in self.Drawings:
-            if drawing[0] not in self.drawn_drawings and drawing[0] not in self.blacklist:
+            if not str(drawing) in str(self.drawn_drawings) and not str(drawing) in str(self.blacklist):
                 # New drawing, draw it
                 print(str(drawing) + "Drawn")
                 b = drawing[0]  # brush
@@ -550,6 +550,8 @@ class Toplevel1:
                 if b == "lineC":
                     self.Canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3], smooth=True)
                 self.drawn_drawings += drawing
+            else:
+                print(f"{drawing} not drawn")
         self.blacklist = []
         self.top.after(100, lambda: self.update())
 
@@ -578,7 +580,7 @@ class Toplevel1:
                 # In this case, command is not a command, but part of the drawing,
                 # and as such it should be appended at the start of new_drawing_string
                 new_drawing_string = command + current_socket.recv(4096).decode()
-                print("New Drawing: "+new_drawing_string)
+                print("New Drawing: " + new_drawing_string)
                 new_drawing = json.loads(new_drawing_string)
                 self.Drawings += new_drawing
             else:
@@ -611,13 +613,13 @@ class Toplevel1:
     def open_user_filter(self):
         if self.status == "c":
             self.net.get_connected_Clients()
-            self.top.after(100, lambda :self.wait_for_clients_user_list())
+            self.top.after(100, lambda: self.wait_for_clients_user_list())
         else:
             client_list = ast.literal_eval(self.net.send_names())
             print(client_list)
             to = tk.Toplevel(self.top)
             user_filter = UserFilterGUI.Toplevel1(top=to, all_users=client_list, current_users=self.user_filter_list)
-            self.top.after(100, lambda :self.await_user_filter_list(user_filter))
+            self.top.after(100, lambda: self.await_user_filter_list(user_filter))
 
     def wait_for_clients_user_list(self):
         if self.net.changed == 1:
@@ -628,7 +630,7 @@ class Toplevel1:
             user_filter = UserFilterGUI.Toplevel1(top=to, all_users=client_list, current_users=self.user_filter_list)
             self.top.after(100, lambda: self.await_user_filter_list(user_filter))
         else:
-            self.top.after(100, lambda :self.wait_for_clients_user_list())
+            self.top.after(100, lambda: self.wait_for_clients_user_list())
 
     def await_user_filter_list(self, user_gui):
         self.user_filter_list = user_gui.user_list
@@ -636,8 +638,9 @@ class Toplevel1:
 
     def open_brush_params(self):
         to = tk.Toplevel(self.top)
-        brush_select = BrushSelectGUI.Toplevel1(top=to, outline_colour=self.colour, fill_colour=self.fill, width=self.width)
-        self.top.after(100, lambda :self.await_brush_change(brush_select))
+        brush_select = BrushSelectGUI.Toplevel1(top=to, outline_colour=self.colour, fill_colour=self.fill,
+                                                width=self.width)
+        self.top.after(100, lambda: self.await_brush_change(brush_select))
 
     def await_brush_change(self, t):
         if t.Changed == 1:
@@ -645,7 +648,8 @@ class Toplevel1:
             self.fill = t.FillC
             self.colour = t.LineC
             t.Changed = 0
-        self.top.after(100, lambda :self.await_brush_change(t))
+        self.top.after(100, lambda: self.await_brush_change(t))
+
 
 """class SvgImage(tk.PhotoImage):
     Widget which can display images in PGM, PPM, GIF, PNG format.

@@ -4,6 +4,7 @@ import select
 import logging
 import socket
 import pickle
+from typing import List
 
 
 class Server:
@@ -157,13 +158,15 @@ class Server:
         file = open(temp_file_name, 'r')
         list_string = file.read()
         file.close()
-        drawing_list = json.loads(list_string)
+        drawing_list: List = json.loads(list_string)
         print(drawing_list)
         os.rename(temp_file_name, "database/" + str(drawing_list[0][0]) + ".txt")
         self.num_of_unnamed_files -= 1
         file = open("database/" + str(drawing_list[0][0]) + ".txt", 'w')
-        for drawing in drawing_list:
-            file.write(str(drawing) + "\n")
+
+        file.write(f"{drawing_list[0]}")
+        for drawing in drawing_list[1:]:
+            file.write(f", \n{str(drawing)}")
         file.close()
 
 def main():

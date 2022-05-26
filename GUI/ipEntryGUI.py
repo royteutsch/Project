@@ -82,7 +82,7 @@ class Toplevel1(GUI):
         except:
             self.ip_entry_button.configure(text='''Unsuccessful!''')
         else:
-            self.replaceGUI(LoginGUI, self.top, [self.ip, self.port])
+            self.replaceGUI(LoginGUI, self.top, [self.ip.get(), self.port])
 
 
 if __name__ == '__main__':

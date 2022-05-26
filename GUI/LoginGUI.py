@@ -123,7 +123,7 @@ class Toplevel1(GUI):
         self.ConnectButton.configure(highlightcolor="black")
         self.ConnectButton.configure(pady="0")
         self.ConnectButton.configure(text='''Connect''')
-        self.ConnectButton.configure(command=lambda: self.connect_to_user(self.Username.get(), self.Password.get()))
+        self.ConnectButton.configure(command=lambda: self.connect_to_user(self.Username.get(), self.Password.get(), self.ip, self.port))
         self.widgets.append(self.ConnectButton)
 
         self.CreateButton = tk.Button(self.top)
