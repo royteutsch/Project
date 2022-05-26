@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Please enter web server ip</title>
+</head>
+<body>
+    <script>
+        function connect_to_webserver() {
+            var web_server_ip = document.getElementById("web_server_entry").value
+            console.log(web_server_ip)
+            sessionStorage.setItem("server_ip", web_server_ip);
+            location.href="web_main.html"
+        }
+    </script>
+
+    <input type="text" id="web_server_entry">
+    <input type="button" value="Connect" onclick="connect_to_webserver()">
+</body>
+</html>

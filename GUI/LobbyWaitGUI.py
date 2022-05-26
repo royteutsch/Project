@@ -38,38 +38,38 @@ class Toplevel1(GUI):
         self.top = top
 
         if params[0]:
-            self.Client = params[0]
+            self.client = params[0]
             # self.ID = params[1]
 
         # self.Client.inquire_lobby(str(self.ID).zfill(12))
 
-        self.Label1 = tk.Label(self.top)
-        self.Label1.place(relx=0.25, rely=0.2, height=71, width=284)
-        self.Label1.configure(anchor='w')
-        self.Label1.configure(background="#d9d9d9")
-        self.Label1.configure(compound='left')
-        self.Label1.configure(disabledforeground="#a3a3a3")
-        self.Label1.configure(font="-family {David} -size 20")
-        self.Label1.configure(foreground="#000000")
-        self.Label1.configure(text='''Connecting''')
+        self.label1 = tk.Label(self.top)
+        self.label1.place(relx=0.25, rely=0.2, height=71, width=284)
+        self.label1.configure(anchor='w')
+        self.label1.configure(background="#d9d9d9")
+        self.label1.configure(compound='left')
+        self.label1.configure(disabledforeground="#a3a3a3")
+        self.label1.configure(font="-family {David} -size 20")
+        self.label1.configure(foreground="#000000")
+        self.label1.configure(text='''Connecting''')
 
-        self.Label2 = tk.Label(self.top)
-        self.Label2.place(relx=0.333, rely=0.489, height=91, width=174)
-        self.Label2.configure(anchor='w')
-        self.Label2.configure(background="#d9d9d9")
-        self.Label2.configure(compound='left')
-        self.Label2.configure(disabledforeground="#a3a3a3")
-        self.Label2.configure(font="-family {David} -size 20")
-        self.Label2.configure(foreground="#000000")
-        self.Label2.configure(text='''Please Wait...''')
+        self.label2 = tk.Label(self.top)
+        self.label2.place(relx=0.333, rely=0.489, height=91, width=174)
+        self.label2.configure(anchor='w')
+        self.label2.configure(background="#d9d9d9")
+        self.label2.configure(compound='left')
+        self.label2.configure(disabledforeground="#a3a3a3")
+        self.label2.configure(font="-family {David} -size 20")
+        self.label2.configure(foreground="#000000")
+        self.label2.configure(text='''Please Wait...''')
 
         self.top.after(1000, self.wait)
 
     def wait(self):
-        self.top.after(100, self.Client.wait_for_lobby)
-        if self.Client.drawing == 1:
+        self.top.after(100, self.client.wait_for_lobby)
+        if self.client.drawing == 1:
             print("Done Waiting")
-            self.replaceGUI(mainGUI, self.top, [self.Client, "c"])
+            self.replaceGUI(mainGUI, self.top, [self.client, "c"])
         else:
             print("Waiting...")
             self.top.after(1000, self.wait)

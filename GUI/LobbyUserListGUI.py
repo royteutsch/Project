@@ -43,18 +43,18 @@ class Toplevel1:
 
         self.listvar = self.list_to_stringvar(self.user_list)
         self.top = top
-        self.UserList = ScrolledListBox(self.top)
-        self.UserList.place(relx=0.0, rely=0.0, relheight=0.979, relwidth=0.966)
-        self.UserList.configure(background="white")
-        self.UserList.configure(cursor="xterm")
-        self.UserList.configure(disabledforeground="#a3a3a3")
-        self.UserList.configure(font="TkFixedFont")
-        self.UserList.configure(foreground="black")
-        self.UserList.configure(highlightbackground="#d9d9d9")
-        self.UserList.configure(highlightcolor="#d9d9d9")
-        self.UserList.configure(selectbackground="blue")
-        self.UserList.configure(selectforeground="white")
-        self.UserList.configure(listvariable=self.listvar)
+        self.user_list = ScrolledListBox(self.top)
+        self.user_list.place(relx=0.0, rely=0.0, relheight=0.979, relwidth=0.966)
+        self.user_list.configure(background="white")
+        self.user_list.configure(cursor="xterm")
+        self.user_list.configure(disabledforeground="#a3a3a3")
+        self.user_list.configure(font="TkFixedFont")
+        self.user_list.configure(foreground="black")
+        self.user_list.configure(highlightbackground="#d9d9d9")
+        self.user_list.configure(highlightcolor="#d9d9d9")
+        self.user_list.configure(selectbackground="blue")
+        self.user_list.configure(selectforeground="white")
+        self.user_list.configure(listvariable=self.listvar)
 
     def list_to_stringvar(self, lst) -> tk.StringVar:
         strvar = ''

@@ -11,10 +11,9 @@ import time
 import tkinter
 import tkinter as tk
 import json
-from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPDF, renderPM
-from PIL import Image, ImageTk
-
+# from svglib.svglib import svg2rlg
+# from reportlab.graphics import renderPDF, renderPM
+# from PIL import Image, ImageTk
 
 
 # import mainGUI_support
@@ -45,13 +44,13 @@ class Toplevel1:
 
         self.start = time.time()
 
-        self.Drawings = []  # This will be updated as people draw
+        self.drawings = []  # This will be updated as people draw
         self.drawn_drawings = []  # Used to remember which drawings have already been rendered, to not redraw everything
         self.brush = "lineS"  # The current brush
         self.colour = '#000000'  # The current color
         self.fill = '#ffffff'  # The current fill
         self.width = 5
-        self.mouseCoords = []  # Used for multi-stroke drawing
+        self.mouse_coords = []  # Used for multi-stroke drawing
         self.blacklist = []
 
         self.time_var = tk.IntVar()
@@ -69,392 +68,397 @@ class Toplevel1:
 
         self.top = top
 
-        self.Canvas = tk.Canvas(self.top)
-        self.Canvas.place(relx=0.102, rely=0.019, relheight=0.947
+        self.canvas = tk.Canvas(self.top)
+        self.canvas.place(relx=0.102, rely=0.019, relheight=0.947
                           , relwidth=0.715)
-        self.Canvas.configure(background="#d9d9d9")
-        self.Canvas.configure(borderwidth="2")
-        self.Canvas.configure(highlightbackground="#d9d9d9")
-        self.Canvas.configure(highlightcolor="black")
-        self.Canvas.configure(insertbackground="black")
-        self.Canvas.configure(relief="ridge")
-        self.Canvas.configure(selectbackground="blue")
-        self.Canvas.configure(selectforeground="white")
-        self.Canvas.bind('<Button-1>', lambda x: self.draw(1))
-        self.Canvas.bind('<Button-3>', lambda x: self.draw(2))
+        self.canvas.configure(background="#d9d9d9")
+        self.canvas.configure(borderwidth="2")
+        self.canvas.configure(highlightbackground="#d9d9d9")
+        self.canvas.configure(highlightcolor="black")
+        self.canvas.configure(insertbackground="black")
+        self.canvas.configure(relief="ridge")
+        self.canvas.configure(selectbackground="blue")
+        self.canvas.configure(selectforeground="white")
+        self.canvas.bind('<Button-1>', lambda x: self.draw(1))
+        self.canvas.bind('<Button-3>', lambda x: self.draw(2))
 
-        self.FilterFrame = tk.Frame(self.top)
-        self.FilterFrame.place(relx=0.825, rely=0.019, relheight=0.951
-                               , relwidth=0.164)
-        self.FilterFrame.configure(relief='groove')
-        self.FilterFrame.configure(borderwidth="2")
-        self.FilterFrame.configure(relief="groove")
-        self.FilterFrame.configure(background="#d9d9d9")
-        self.FilterFrame.configure(highlightbackground="#d9d9d9")
-        self.FilterFrame.configure(highlightcolor="black")
+        self.filter_frame = tk.Frame(self.top)
+        self.filter_frame.place(relx=0.825, rely=0.019, relheight=0.951
+                                , relwidth=0.164)
+        self.filter_frame.configure(relief='groove')
+        self.filter_frame.configure(borderwidth="2")
+        self.filter_frame.configure(relief="groove")
+        self.filter_frame.configure(background="#d9d9d9")
+        self.filter_frame.configure(highlightbackground="#d9d9d9")
+        self.filter_frame.configure(highlightcolor="black")
 
-        self.FilterLabel = tk.Label(self.FilterFrame)
-        self.FilterLabel.place(relx=0.069, rely=0.02, height=81, width=124)
-        self.FilterLabel.configure(activebackground="#f9f9f9")
-        self.FilterLabel.configure(activeforeground="black")
-        self.FilterLabel.configure(background="#d9d9d9")
-        self.FilterLabel.configure(disabledforeground="#a3a3a3")
-        self.FilterLabel.configure(font="-family {David} -size 20")
-        self.FilterLabel.configure(foreground="#000000")
-        self.FilterLabel.configure(highlightbackground="#d9d9d9")
-        self.FilterLabel.configure(highlightcolor="black")
-        self.FilterLabel.configure(text='''Filters''')
+        self.filter_label = tk.Label(self.filter_frame)
+        self.filter_label.place(relx=0.069, rely=0.02, height=81, width=124)
+        self.filter_label.configure(activebackground="#f9f9f9")
+        self.filter_label.configure(activeforeground="black")
+        self.filter_label.configure(background="#d9d9d9")
+        self.filter_label.configure(disabledforeground="#a3a3a3")
+        self.filter_label.configure(font="-family {David} -size 20")
+        self.filter_label.configure(foreground="#000000")
+        self.filter_label.configure(highlightbackground="#d9d9d9")
+        self.filter_label.configure(highlightcolor="black")
+        self.filter_label.configure(text='''Filters''')
 
-        self.TimeFilterFrame = tk.Frame(self.FilterFrame)
-        self.TimeFilterFrame.place(relx=0.0, rely=0.178, relheight=0.228
-                                   , relwidth=1.0)
-        self.TimeFilterFrame.configure(relief='groove')
-        self.TimeFilterFrame.configure(borderwidth="2")
-        self.TimeFilterFrame.configure(relief="groove")
-        self.TimeFilterFrame.configure(background="#d9d9d9")
-        self.TimeFilterFrame.configure(highlightbackground="#d9d9d9")
-        self.TimeFilterFrame.configure(highlightcolor="black")
-
-        self.FromLabel = tk.Label(self.TimeFilterFrame)
-        self.FromLabel.place(relx=0.069, rely=0.087, height=31, width=54)
-        self.FromLabel.configure(activebackground="#f9f9f9")
-        self.FromLabel.configure(activeforeground="black")
-        self.FromLabel.configure(anchor='w')
-        self.FromLabel.configure(background="#d9d9d9")
-        self.FromLabel.configure(compound='left')
-        self.FromLabel.configure(disabledforeground="#a3a3a3")
-        self.FromLabel.configure(font="-family {David} -size 12")
-        self.FromLabel.configure(foreground="#000000")
-        self.FromLabel.configure(highlightbackground="#d9d9d9")
-        self.FromLabel.configure(highlightcolor="black")
-        self.FromLabel.configure(text='''From:''')
-
-        self.FromEntry = tk.Entry(self.TimeFilterFrame)
-        self.FromEntry.place(relx=0.483, rely=0.087, height=30, relwidth=0.441)
-        self.FromEntry.configure(background="white")
-        self.FromEntry.configure(disabledforeground="#a3a3a3")
-        self.FromEntry.configure(font="TkFixedFont")
-        self.FromEntry.configure(foreground="#000000")
-        self.FromEntry.configure(highlightbackground="#d9d9d9")
-        self.FromEntry.configure(highlightcolor="black")
-        self.FromEntry.configure(insertbackground="black")
-        self.FromEntry.configure(selectbackground="blue")
-        self.FromEntry.configure(selectforeground="white")
-
-        self.ToLabel = tk.Label(self.TimeFilterFrame)
-        self.ToLabel.place(relx=0.069, rely=0.348, height=31, width=44)
-        self.ToLabel.configure(activebackground="#f9f9f9")
-        self.ToLabel.configure(activeforeground="black")
-        self.ToLabel.configure(anchor='w')
-        self.ToLabel.configure(background="#d9d9d9")
-        self.ToLabel.configure(compound='left')
-        self.ToLabel.configure(disabledforeground="#a3a3a3")
-        self.ToLabel.configure(font="-family {David} -size 12")
-        self.ToLabel.configure(foreground="#000000")
-        self.ToLabel.configure(highlightbackground="#d9d9d9")
-        self.ToLabel.configure(highlightcolor="black")
-        self.ToLabel.configure(text='''To:''')
-
-        self.ToEntry = tk.Entry(self.TimeFilterFrame)
-        self.ToEntry.place(relx=0.483, rely=0.348, height=30, relwidth=0.441)
-        self.ToEntry.configure(background="white")
-        self.ToEntry.configure(disabledforeground="#a3a3a3")
-        self.ToEntry.configure(font="TkFixedFont")
-        self.ToEntry.configure(foreground="#000000")
-        self.ToEntry.configure(highlightbackground="#d9d9d9")
-        self.ToEntry.configure(highlightcolor="black")
-        self.ToEntry.configure(insertbackground="black")
-        self.ToEntry.configure(selectbackground="blue")
-        self.ToEntry.configure(selectforeground="white")
-
-        self.ExplanationLabel = tk.Label(self.TimeFilterFrame)
-        self.ExplanationLabel.place(relx=0.069, rely=0.696, height=31, width=124)
-
-        self.ExplanationLabel.configure(activebackground="#f9f9f9")
-        self.ExplanationLabel.configure(activeforeground="black")
-        self.ExplanationLabel.configure(anchor='w')
-        self.ExplanationLabel.configure(background="#d9d9d9")
-        self.ExplanationLabel.configure(compound='left')
-        self.ExplanationLabel.configure(disabledforeground="#a3a3a3")
-        self.ExplanationLabel.configure(font="-family {David} -size 9")
-        self.ExplanationLabel.configure(foreground="#000000")
-        self.ExplanationLabel.configure(highlightbackground="#d9d9d9")
-        self.ExplanationLabel.configure(highlightcolor="black")
-        self.ExplanationLabel.configure(text='''Leave Empty for Present''')
-
-        self.TimeFilterCheck = tk.Checkbutton(self.TimeFilterFrame)
-        self.TimeFilterCheck.place(relx=0.069, rely=0.522, relheight=0.217, relwidth = 0.421)
-        self.TimeFilterCheck.configure(activebackground="#ececec")
-        self.TimeFilterCheck.configure(activeforeground="#000000")
-        self.TimeFilterCheck.configure(anchor='w')
-        self.TimeFilterCheck.configure(background="#d9d9d9")
-        self.TimeFilterCheck.configure(compound='left')
-        self.TimeFilterCheck.configure(disabledforeground="#a3a3a3")
-        self.TimeFilterCheck.configure(foreground="#000000")
-        self.TimeFilterCheck.configure(highlightbackground="#d9d9d9")
-        self.TimeFilterCheck.configure(highlightcolor="black")
-        self.TimeFilterCheck.configure(justify='left')
-        self.TimeFilterCheck.configure(selectcolor="#d9d9d9")
-        self.TimeFilterCheck.configure(text='''Active''')
-        self.TimeFilterCheck.configure(variable=self.time_var)
-
-        self.ColourFilterFrame = tk.Frame(self.FilterFrame)
-        self.ColourFilterFrame.place(relx=0.0, rely=0.396, relheight=0.287
+        self.time_filter_frame = tk.Frame(self.filter_frame)
+        self.time_filter_frame.place(relx=0.0, rely=0.178, relheight=0.228
                                      , relwidth=1.0)
-        self.ColourFilterFrame.configure(relief='groove')
-        self.ColourFilterFrame.configure(borderwidth="2")
-        self.ColourFilterFrame.configure(relief="groove")
-        self.ColourFilterFrame.configure(background="#d9d9d9")
-        self.ColourFilterFrame.configure(highlightbackground="#d9d9d9")
-        self.ColourFilterFrame.configure(highlightcolor="black")
+        self.time_filter_frame.configure(relief='groove')
+        self.time_filter_frame.configure(borderwidth="2")
+        self.time_filter_frame.configure(relief="groove")
+        self.time_filter_frame.configure(background="#d9d9d9")
+        self.time_filter_frame.configure(highlightbackground="#d9d9d9")
+        self.time_filter_frame.configure(highlightcolor="black")
 
-        self.ColourLabel = tk.Label(self.ColourFilterFrame)
-        self.ColourLabel.place(relx=0.207, rely=0.069, height=51, width=84)
-        self.ColourLabel.configure(activebackground="#f9f9f9")
-        self.ColourLabel.configure(activeforeground="black")
-        self.ColourLabel.configure(background="#d9d9d9")
-        self.ColourLabel.configure(compound='left')
-        self.ColourLabel.configure(disabledforeground="#a3a3a3")
-        self.ColourLabel.configure(font="-family {David} -size 20")
-        self.ColourLabel.configure(foreground="#000000")
-        self.ColourLabel.configure(highlightbackground="#d9d9d9")
-        self.ColourLabel.configure(highlightcolor="black")
-        self.ColourLabel.configure(text='''Colour''')
+        self.from_label = tk.Label(self.time_filter_frame)
+        self.from_label.place(relx=0.069, rely=0.087, height=31, width=54)
+        self.from_label.configure(activebackground="#f9f9f9")
+        self.from_label.configure(activeforeground="black")
+        self.from_label.configure(anchor='w')
+        self.from_label.configure(background="#d9d9d9")
+        self.from_label.configure(compound='left')
+        self.from_label.configure(disabledforeground="#a3a3a3")
+        self.from_label.configure(font="-family {David} -size 12")
+        self.from_label.configure(foreground="#000000")
+        self.from_label.configure(highlightbackground="#d9d9d9")
+        self.from_label.configure(highlightcolor="black")
+        self.from_label.configure(text='''From:''')
 
-        self.ColourButton = tk.Button(self.ColourFilterFrame)
-        self.ColourButton.place(relx=0.138, rely=0.552, height=54, width=107)
-        self.ColourButton.configure(activebackground="#ececec")
-        self.ColourButton.configure(activeforeground="#000000")
-        self.ColourButton.configure(background="#d9d9d9")
-        self.ColourButton.configure(compound='left')
-        self.ColourButton.configure(disabledforeground="#a3a3a3")
-        self.ColourButton.configure(font="-family {David} -size 20")
-        self.ColourButton.configure(foreground="#000000")
-        self.ColourButton.configure(highlightbackground="#d9d9d9")
-        self.ColourButton.configure(highlightcolor="black")
-        self.ColourButton.configure(pady="0")
-        self.ColourButton.configure(text='''Choose''')
-        self.ColourButton.configure(command=lambda :self.open_colour_filter())
+        self.from_entry = tk.Entry(self.time_filter_frame)
+        self.from_entry.place(relx=0.483, rely=0.087, height=30, relwidth=0.441)
+        self.from_entry.configure(background="white")
+        self.from_entry.configure(disabledforeground="#a3a3a3")
+        self.from_entry.configure(font="TkFixedFont")
+        self.from_entry.configure(foreground="#000000")
+        self.from_entry.configure(highlightbackground="#d9d9d9")
+        self.from_entry.configure(highlightcolor="black")
+        self.from_entry.configure(insertbackground="black")
+        self.from_entry.configure(selectbackground="blue")
+        self.from_entry.configure(selectforeground="white")
 
-        self.ColourFilterCheck = tk.Checkbutton(self.ColourFilterFrame)
-        self.ColourFilterCheck.place(relx=0.276, rely=0.345, relheight=0.172, relwidth = 0.421)
-        self.ColourFilterCheck.configure(activebackground="#ececec")
-        self.ColourFilterCheck.configure(activeforeground="#000000")
-        self.ColourFilterCheck.configure(anchor='w')
-        self.ColourFilterCheck.configure(background="#d9d9d9")
-        self.ColourFilterCheck.configure(compound='left')
-        self.ColourFilterCheck.configure(disabledforeground="#a3a3a3")
-        self.ColourFilterCheck.configure(foreground="#000000")
-        self.ColourFilterCheck.configure(highlightbackground="#d9d9d9")
-        self.ColourFilterCheck.configure(highlightcolor="black")
-        self.ColourFilterCheck.configure(justify='left')
-        self.ColourFilterCheck.configure(selectcolor="#d9d9d9")
-        self.ColourFilterCheck.configure(text='''Active''')
-        self.ColourFilterCheck.configure(variable=self.colour_var)
+        self.to_label = tk.Label(self.time_filter_frame)
+        self.to_label.place(relx=0.069, rely=0.348, height=31, width=44)
+        self.to_label.configure(activebackground="#f9f9f9")
+        self.to_label.configure(activeforeground="black")
+        self.to_label.configure(anchor='w')
+        self.to_label.configure(background="#d9d9d9")
+        self.to_label.configure(compound='left')
+        self.to_label.configure(disabledforeground="#a3a3a3")
+        self.to_label.configure(font="-family {David} -size 12")
+        self.to_label.configure(foreground="#000000")
+        self.to_label.configure(highlightbackground="#d9d9d9")
+        self.to_label.configure(highlightcolor="black")
+        self.to_label.configure(text='''To:''')
 
-        self.UserFilterFrame = tk.Frame(self.FilterFrame)
-        self.UserFilterFrame.place(relx=0.0, rely=0.673, relheight=0.327
-                                   , relwidth=1.0)
-        self.UserFilterFrame.configure(relief='groove')
-        self.UserFilterFrame.configure(borderwidth="2")
-        self.UserFilterFrame.configure(relief="groove")
-        self.UserFilterFrame.configure(background="#d9d9d9")
-        self.UserFilterFrame.configure(highlightbackground="#d9d9d9")
-        self.UserFilterFrame.configure(highlightcolor="black")
+        self.to_entry = tk.Entry(self.time_filter_frame)
+        self.to_entry.place(relx=0.483, rely=0.348, height=30, relwidth=0.441)
+        self.to_entry.configure(background="white")
+        self.to_entry.configure(disabledforeground="#a3a3a3")
+        self.to_entry.configure(font="TkFixedFont")
+        self.to_entry.configure(foreground="#000000")
+        self.to_entry.configure(highlightbackground="#d9d9d9")
+        self.to_entry.configure(highlightcolor="black")
+        self.to_entry.configure(insertbackground="black")
+        self.to_entry.configure(selectbackground="blue")
+        self.to_entry.configure(selectforeground="white")
 
-        self.UserLabel = tk.Label(self.UserFilterFrame)
-        self.UserLabel.place(relx=0.069, rely=0.061, height=61, width=124)
-        self.UserLabel.configure(activebackground="#f9f9f9")
-        self.UserLabel.configure(activeforeground="black")
-        self.UserLabel.configure(background="#d9d9d9")
-        self.UserLabel.configure(compound='left')
-        self.UserLabel.configure(disabledforeground="#a3a3a3")
-        self.UserLabel.configure(font="-family {David} -size 20")
-        self.UserLabel.configure(foreground="#000000")
-        self.UserLabel.configure(highlightbackground="#d9d9d9")
-        self.UserLabel.configure(highlightcolor="black")
-        self.UserLabel.configure(text='''Users''')
+        self.explanation_label = tk.Label(self.time_filter_frame)
+        self.explanation_label.place(relx=0.069, rely=0.696, height=31, width=124)
 
-        self.UserButton = tk.Button(self.UserFilterFrame)
-        self.UserButton.place(relx=0.138, rely=0.606, height=54, width=107)
-        self.UserButton.configure(activebackground="#ececec")
-        self.UserButton.configure(activeforeground="#000000")
-        self.UserButton.configure(background="#d9d9d9")
-        self.UserButton.configure(compound='left')
-        self.UserButton.configure(disabledforeground="#a3a3a3")
-        self.UserButton.configure(font="-family {David} -size 20")
-        self.UserButton.configure(foreground="#000000")
-        self.UserButton.configure(highlightbackground="#d9d9d9")
-        self.UserButton.configure(highlightcolor="black")
-        self.UserButton.configure(pady="0")
-        self.UserButton.configure(text='''Choose''')
-        self.UserButton.configure(command=lambda :self.open_user_filter())
+        self.explanation_label.configure(activebackground="#f9f9f9")
+        self.explanation_label.configure(activeforeground="black")
+        self.explanation_label.configure(anchor='w')
+        self.explanation_label.configure(background="#d9d9d9")
+        self.explanation_label.configure(compound='left')
+        self.explanation_label.configure(disabledforeground="#a3a3a3")
+        self.explanation_label.configure(font="-family {David} -size 9")
+        self.explanation_label.configure(foreground="#000000")
+        self.explanation_label.configure(highlightbackground="#d9d9d9")
+        self.explanation_label.configure(highlightcolor="black")
+        self.explanation_label.configure(text='''Leave Empty for Present''')
 
-        self.UserFilterCheck = tk.Checkbutton(self.UserFilterFrame)
-        self.UserFilterCheck.place(relx=0.276, rely=0.424, relheight=0.152, relwidth = 0.421)
-        self.UserFilterCheck.configure(activebackground="#ececec")
-        self.UserFilterCheck.configure(activeforeground="#000000")
-        self.UserFilterCheck.configure(anchor='w')
-        self.UserFilterCheck.configure(background="#d9d9d9")
-        self.UserFilterCheck.configure(compound='left')
-        self.UserFilterCheck.configure(disabledforeground="#a3a3a3")
-        self.UserFilterCheck.configure(foreground="#000000")
-        self.UserFilterCheck.configure(highlightbackground="#d9d9d9")
-        self.UserFilterCheck.configure(highlightcolor="black")
-        self.UserFilterCheck.configure(justify='left')
-        self.UserFilterCheck.configure(selectcolor="#d9d9d9")
-        self.UserFilterCheck.configure(text='''Active''')
-        self.UserFilterCheck.configure(variable=self.user_var)
+        self.time_filter_check = tk.Checkbutton(self.time_filter_frame)
+        self.time_filter_check.place(relx=0.069, rely=0.522, relheight=0.217, relwidth=0.421)
+        self.time_filter_check.configure(activebackground="#ececec")
+        self.time_filter_check.configure(activeforeground="#000000")
+        self.time_filter_check.configure(anchor='w')
+        self.time_filter_check.configure(background="#d9d9d9")
+        self.time_filter_check.configure(compound='left')
+        self.time_filter_check.configure(disabledforeground="#a3a3a3")
+        self.time_filter_check.configure(foreground="#000000")
+        self.time_filter_check.configure(highlightbackground="#d9d9d9")
+        self.time_filter_check.configure(highlightcolor="black")
+        self.time_filter_check.configure(justify='left')
+        self.time_filter_check.configure(selectcolor="#d9d9d9")
+        self.time_filter_check.configure(text='''Active''')
+        self.time_filter_check.configure(variable=self.time_var)
 
-        self.ActivateAllFilter = tk.Checkbutton(self.FilterFrame)
-        self.ActivateAllFilter.place(relx=0.207, rely=0.119, relheight=0.05, relwidth = 0.559)
-        self.ActivateAllFilter.configure(activebackground="#ececec")
-        self.ActivateAllFilter.configure(activeforeground="#000000")
-        self.ActivateAllFilter.configure(anchor='w')
-        self.ActivateAllFilter.configure(background="#d9d9d9")
-        self.ActivateAllFilter.configure(compound='left')
-        self.ActivateAllFilter.configure(disabledforeground="#a3a3a3")
-        self.ActivateAllFilter.configure(foreground="#000000")
-        self.ActivateAllFilter.configure(highlightbackground="#d9d9d9")
-        self.ActivateAllFilter.configure(highlightcolor="black")
-        self.ActivateAllFilter.configure(justify='left')
-        self.ActivateAllFilter.configure(selectcolor="#d9d9d9")
-        self.ActivateAllFilter.configure(text='''Active All''')
-        self.ActivateAllFilter.configure(variable=self.all_filter_var)
+        self.colour_filter_frame = tk.Frame(self.filter_frame)
+        self.colour_filter_frame.place(relx=0.0, rely=0.396, relheight=0.287
+                                       , relwidth=1.0)
+        self.colour_filter_frame.configure(relief='groove')
+        self.colour_filter_frame.configure(borderwidth="2")
+        self.colour_filter_frame.configure(relief="groove")
+        self.colour_filter_frame.configure(background="#d9d9d9")
+        self.colour_filter_frame.configure(highlightbackground="#d9d9d9")
+        self.colour_filter_frame.configure(highlightcolor="black")
 
-        self.Frame1 = tk.Frame(self.top)
-        self.Frame1.place(relx=0.0, rely=0.038, relheight=0.838, relwidth=0.096)
-        self.Frame1.configure(relief='groove')
-        self.Frame1.configure(borderwidth="2")
-        self.Frame1.configure(relief="groove")
-        self.Frame1.configure(background="#d9d9d9")
-        self.Frame1.configure(highlightbackground="#d9d9d9")
-        self.Frame1.configure(highlightcolor="black")
+        self.colour_label = tk.Label(self.colour_filter_frame)
+        self.colour_label.place(relx=0.207, rely=0.069, height=51, width=84)
+        self.colour_label.configure(activebackground="#f9f9f9")
+        self.colour_label.configure(activeforeground="black")
+        self.colour_label.configure(background="#d9d9d9")
+        self.colour_label.configure(compound='left')
+        self.colour_label.configure(disabledforeground="#a3a3a3")
+        self.colour_label.configure(font="-family {David} -size 20")
+        self.colour_label.configure(foreground="#000000")
+        self.colour_label.configure(highlightbackground="#d9d9d9")
+        self.colour_label.configure(highlightcolor="black")
+        self.colour_label.configure(text='''Colour''')
 
-        self.StraightButton = tk.Button(self.Frame1)
-        self.StraightButton.place(relx=0.0, rely=0.0, height=94, width=87)
-        self.StraightButton.configure(activebackground="#ececec")
-        self.StraightButton.configure(activeforeground="#000000")
-        self.StraightButton.configure(background="#d9d9d9")
-        self.StraightButton.configure(compound='left')
-        self.StraightButton.configure(disabledforeground="#a3a3a3")
-        self.StraightButton.configure(foreground="#000000")
-        self.StraightButton.configure(highlightbackground="#d9d9d9")
-        self.StraightButton.configure(highlightcolor="black")
-        self.StraightButton.configure(command=lambda: self.changeBrush("lineS"))
+        self.colour_button = tk.Button(self.colour_filter_frame)
+        self.colour_button.place(relx=0.138, rely=0.552, height=54, width=107)
+        self.colour_button.configure(activebackground="#ececec")
+        self.colour_button.configure(activeforeground="#000000")
+        self.colour_button.configure(background="#d9d9d9")
+        self.colour_button.configure(compound='left')
+        self.colour_button.configure(disabledforeground="#a3a3a3")
+        self.colour_button.configure(font="-family {David} -size 20")
+        self.colour_button.configure(foreground="#000000")
+        self.colour_button.configure(highlightbackground="#d9d9d9")
+        self.colour_button.configure(highlightcolor="black")
+        self.colour_button.configure(pady="0")
+        self.colour_button.configure(text='''Choose''')
+        self.colour_button.configure(command=lambda: self.open_colour_filter())
+
+        self.colour_filter_check = tk.Checkbutton(self.colour_filter_frame)
+        self.colour_filter_check.place(relx=0.276, rely=0.345, relheight=0.172, relwidth=0.421)
+        self.colour_filter_check.configure(activebackground="#ececec")
+        self.colour_filter_check.configure(activeforeground="#000000")
+        self.colour_filter_check.configure(anchor='w')
+        self.colour_filter_check.configure(background="#d9d9d9")
+        self.colour_filter_check.configure(compound='left')
+        self.colour_filter_check.configure(disabledforeground="#a3a3a3")
+        self.colour_filter_check.configure(foreground="#000000")
+        self.colour_filter_check.configure(highlightbackground="#d9d9d9")
+        self.colour_filter_check.configure(highlightcolor="black")
+        self.colour_filter_check.configure(justify='left')
+        self.colour_filter_check.configure(selectcolor="#d9d9d9")
+        self.colour_filter_check.configure(text='''Active''')
+        self.colour_filter_check.configure(variable=self.colour_var)
+
+        self.user_filter_frame = tk.Frame(self.filter_frame)
+        self.user_filter_frame.place(relx=0.0, rely=0.673, relheight=0.327
+                                     , relwidth=1.0)
+        self.user_filter_frame.configure(relief='groove')
+        self.user_filter_frame.configure(borderwidth="2")
+        self.user_filter_frame.configure(relief="groove")
+        self.user_filter_frame.configure(background="#d9d9d9")
+        self.user_filter_frame.configure(highlightbackground="#d9d9d9")
+        self.user_filter_frame.configure(highlightcolor="black")
+
+        self.user_label = tk.Label(self.user_filter_frame)
+        self.user_label.place(relx=0.069, rely=0.061, height=61, width=124)
+        self.user_label.configure(activebackground="#f9f9f9")
+        self.user_label.configure(activeforeground="black")
+        self.user_label.configure(background="#d9d9d9")
+        self.user_label.configure(compound='left')
+        self.user_label.configure(disabledforeground="#a3a3a3")
+        self.user_label.configure(font="-family {David} -size 20")
+        self.user_label.configure(foreground="#000000")
+        self.user_label.configure(highlightbackground="#d9d9d9")
+        self.user_label.configure(highlightcolor="black")
+        self.user_label.configure(text='''Users''')
+
+        self.user_button = tk.Button(self.user_filter_frame)
+        self.user_button.place(relx=0.138, rely=0.606, height=54, width=107)
+        self.user_button.configure(activebackground="#ececec")
+        self.user_button.configure(activeforeground="#000000")
+        self.user_button.configure(background="#d9d9d9")
+        self.user_button.configure(compound='left')
+        self.user_button.configure(disabledforeground="#a3a3a3")
+        self.user_button.configure(font="-family {David} -size 20")
+        self.user_button.configure(foreground="#000000")
+        self.user_button.configure(highlightbackground="#d9d9d9")
+        self.user_button.configure(highlightcolor="black")
+        self.user_button.configure(pady="0")
+        self.user_button.configure(text='''Choose''')
+        self.user_button.configure(command=lambda: self.open_user_filter())
+
+        self.user_filter_check = tk.Checkbutton(self.user_filter_frame)
+        self.user_filter_check.place(relx=0.276, rely=0.424, relheight=0.152, relwidth=0.421)
+        self.user_filter_check.configure(activebackground="#ececec")
+        self.user_filter_check.configure(activeforeground="#000000")
+        self.user_filter_check.configure(anchor='w')
+        self.user_filter_check.configure(background="#d9d9d9")
+        self.user_filter_check.configure(compound='left')
+        self.user_filter_check.configure(disabledforeground="#a3a3a3")
+        self.user_filter_check.configure(foreground="#000000")
+        self.user_filter_check.configure(highlightbackground="#d9d9d9")
+        self.user_filter_check.configure(highlightcolor="black")
+        self.user_filter_check.configure(justify='left')
+        self.user_filter_check.configure(selectcolor="#d9d9d9")
+        self.user_filter_check.configure(text='''Active''')
+        self.user_filter_check.configure(variable=self.user_var)
+
+        self.activate_all_filter = tk.Checkbutton(self.filter_frame)
+        self.activate_all_filter.place(relx=0.207, rely=0.119, relheight=0.05, relwidth=0.559)
+        self.activate_all_filter.configure(activebackground="#ececec")
+        self.activate_all_filter.configure(activeforeground="#000000")
+        self.activate_all_filter.configure(anchor='w')
+        self.activate_all_filter.configure(background="#d9d9d9")
+        self.activate_all_filter.configure(compound='left')
+        self.activate_all_filter.configure(disabledforeground="#a3a3a3")
+        self.activate_all_filter.configure(foreground="#000000")
+        self.activate_all_filter.configure(highlightbackground="#d9d9d9")
+        self.activate_all_filter.configure(highlightcolor="black")
+        self.activate_all_filter.configure(justify='left')
+        self.activate_all_filter.configure(selectcolor="#d9d9d9")
+        self.activate_all_filter.configure(text='''Active All''')
+        self.activate_all_filter.configure(variable=self.all_filter_var)
+
+        self.brush_frame = tk.Frame(self.top)
+        self.brush_frame.place(relx=0.0, rely=0.038, relheight=0.838, relwidth=0.096)
+        self.brush_frame.configure(relief='groove')
+        self.brush_frame.configure(borderwidth="2")
+        self.brush_frame.configure(relief="groove")
+        self.brush_frame.configure(background="#d9d9d9")
+        self.brush_frame.configure(highlightbackground="#d9d9d9")
+        self.brush_frame.configure(highlightcolor="black")
+
+        self.straight_button = tk.Button(self.brush_frame)
+        self.straight_button.place(relx=0.0, rely=0.0, height=94, width=87)
+        self.straight_button.configure(activebackground="#ececec")
+        self.straight_button.configure(activeforeground="#000000")
+        self.straight_button.configure(background="#d9d9d9")
+        self.straight_button.configure(compound='left')
+        self.straight_button.configure(disabledforeground="#a3a3a3")
+        self.straight_button.configure(foreground="#000000")
+        self.straight_button.configure(highlightbackground="#d9d9d9")
+        self.straight_button.configure(highlightcolor="black")
+        self.straight_button.configure(command=lambda: self.changeBrush("lineS"))
         photo_location = "./straightLine.png"
         global _img0
         _img0 = tk.PhotoImage(file=photo_location)
-        self.StraightButton.configure(image=_img0)
-        self.StraightButton.configure(pady="0")
+        self.straight_button.configure(image=_img0)
+        self.straight_button.configure(pady="0")
 
-        self.CurvedButton = tk.Button(self.Frame1)
-        self.CurvedButton.place(relx=0.0, rely=0.202, height=94, width=87)
-        self.CurvedButton.configure(activebackground="#ececec")
-        self.CurvedButton.configure(activeforeground="#000000")
-        self.CurvedButton.configure(background="#d9d9d9")
-        self.CurvedButton.configure(compound='left')
-        self.CurvedButton.configure(disabledforeground="#a3a3a3")
-        self.CurvedButton.configure(foreground="#000000")
-        self.CurvedButton.configure(highlightbackground="#d9d9d9")
-        self.CurvedButton.configure(highlightcolor="black")
-        self.CurvedButton.configure(command=lambda: self.changeBrush("lineC"))
+        self.curved_button = tk.Button(self.brush_frame)
+        self.curved_button.place(relx=0.0, rely=0.202, height=94, width=87)
+        self.curved_button.configure(activebackground="#ececec")
+        self.curved_button.configure(activeforeground="#000000")
+        self.curved_button.configure(background="#d9d9d9")
+        self.curved_button.configure(compound='left')
+        self.curved_button.configure(disabledforeground="#a3a3a3")
+        self.curved_button.configure(foreground="#000000")
+        self.curved_button.configure(highlightbackground="#d9d9d9")
+        self.curved_button.configure(highlightcolor="black")
+        self.curved_button.configure(command=lambda: self.changeBrush("lineC"))
         photo_location = "./curvedLine.png"
         global _img1
         _img1 = tk.PhotoImage(file=photo_location)
-        self.CurvedButton.configure(image=_img1)
-        self.CurvedButton.configure(pady="0")
+        self.curved_button.configure(image=_img1)
+        self.curved_button.configure(pady="0")
 
-        self.RectButton = tk.Button(self.Frame1)
-        self.RectButton.place(relx=0.0, rely=0.404, height=94, width=87)
-        self.RectButton.configure(activebackground="#ececec")
-        self.RectButton.configure(activeforeground="#000000")
-        self.RectButton.configure(background="#d9d9d9")
-        self.RectButton.configure(compound='left')
-        self.RectButton.configure(disabledforeground="#a3a3a3")
-        self.RectButton.configure(foreground="#000000")
-        self.RectButton.configure(highlightbackground="#d9d9d9")
-        self.RectButton.configure(highlightcolor="black")
-        self.RectButton.configure(command=lambda: self.changeBrush("rect"))
+        self.rect_button = tk.Button(self.brush_frame)
+        self.rect_button.place(relx=0.0, rely=0.404, height=94, width=87)
+        self.rect_button.configure(activebackground="#ececec")
+        self.rect_button.configure(activeforeground="#000000")
+        self.rect_button.configure(background="#d9d9d9")
+        self.rect_button.configure(compound='left')
+        self.rect_button.configure(disabledforeground="#a3a3a3")
+        self.rect_button.configure(foreground="#000000")
+        self.rect_button.configure(highlightbackground="#d9d9d9")
+        self.rect_button.configure(highlightcolor="black")
+        self.rect_button.configure(command=lambda: self.changeBrush("rect"))
         photo_location = "./rectangle.png"
         global _img2
         _img2 = tk.PhotoImage(file=photo_location)
-        self.RectButton.configure(image=_img2)
-        self.RectButton.configure(pady="0")
+        self.rect_button.configure(image=_img2)
+        self.rect_button.configure(pady="0")
 
-        self.PolyButton = tk.Button(self.Frame1)
-        self.PolyButton.place(relx=0.0, rely=0.607, height=94, width=87)
-        self.PolyButton.configure(activebackground="#ececec")
-        self.PolyButton.configure(activeforeground="#000000")
-        self.PolyButton.configure(background="#d9d9d9")
-        self.PolyButton.configure(compound='left')
-        self.PolyButton.configure(disabledforeground="#a3a3a3")
-        self.PolyButton.configure(foreground="#000000")
-        self.PolyButton.configure(highlightbackground="#d9d9d9")
-        self.PolyButton.configure(highlightcolor="black")
-        self.PolyButton.configure(command=lambda: self.changeBrush("poly"))
+        self.poly_button = tk.Button(self.brush_frame)
+        self.poly_button.place(relx=0.0, rely=0.607, height=94, width=87)
+        self.poly_button.configure(activebackground="#ececec")
+        self.poly_button.configure(activeforeground="#000000")
+        self.poly_button.configure(background="#d9d9d9")
+        self.poly_button.configure(compound='left')
+        self.poly_button.configure(disabledforeground="#a3a3a3")
+        self.poly_button.configure(foreground="#000000")
+        self.poly_button.configure(highlightbackground="#d9d9d9")
+        self.poly_button.configure(highlightcolor="black")
+        self.poly_button.configure(command=lambda: self.changeBrush("poly"))
         photo_location = "./polyhedron.png"
         global _img3
         _img3 = tk.PhotoImage(file=photo_location)
-        self.PolyButton.configure(image=_img3)
-        self.PolyButton.configure(pady="0")
+        self.poly_button.configure(image=_img3)
+        self.poly_button.configure(pady="0")
 
-        self.CircleButton = tk.Button(self.Frame1)
-        self.CircleButton.place(relx=0.0, rely=0.809, height=94, width=87)
-        self.CircleButton.configure(activebackground="#ececec")
-        self.CircleButton.configure(activeforeground="#000000")
-        self.CircleButton.configure(background="#d9d9d9")
-        self.CircleButton.configure(compound='left')
-        self.CircleButton.configure(disabledforeground="#a3a3a3")
-        self.CircleButton.configure(foreground="#000000")
-        self.CircleButton.configure(highlightbackground="#d9d9d9")
-        self.CircleButton.configure(highlightcolor="black")
-        self.CircleButton.configure(command=lambda: self.changeBrush("oval"))
+        self.circle_button = tk.Button(self.brush_frame)
+        self.circle_button.place(relx=0.0, rely=0.809, height=94, width=87)
+        self.circle_button.configure(activebackground="#ececec")
+        self.circle_button.configure(activeforeground="#000000")
+        self.circle_button.configure(background="#d9d9d9")
+        self.circle_button.configure(compound='left')
+        self.circle_button.configure(disabledforeground="#a3a3a3")
+        self.circle_button.configure(foreground="#000000")
+        self.circle_button.configure(highlightbackground="#d9d9d9")
+        self.circle_button.configure(highlightcolor="black")
+        self.circle_button.configure(command=lambda: self.changeBrush("oval"))
         photo_location = "./circle.png"
         global _img4
         _img4 = tk.PhotoImage(file=photo_location)
-        self.CircleButton.configure(image=_img4)
-        self.CircleButton.configure(pady="0")
+        self.circle_button.configure(image=_img4)
+        self.circle_button.configure(pady="0")
 
-        self.ParamButton = tk.Button(self.top)
-        self.ParamButton.place(relx=0.723, rely=0.791, height=84, width=79)
-        self.ParamButton.configure(activebackground="#ececec")
-        self.ParamButton.configure(activeforeground="#000000")
-        self.ParamButton.configure(background="#d9d9d9")
-        self.ParamButton.configure(compound='left')
-        self.ParamButton.configure(disabledforeground="#a3a3a3")
-        self.ParamButton.configure(foreground="#000000")
-        self.ParamButton.configure(highlightbackground="#d9d9d9")
-        self.ParamButton.configure(highlightcolor="black")
+        self.param_button = tk.Button(self.top)
+        self.param_button.place(relx=0.723, rely=0.791, height=84, width=79)
+        self.param_button.configure(activebackground="#ececec")
+        self.param_button.configure(activeforeground="#000000")
+        self.param_button.configure(background="#d9d9d9")
+        self.param_button.configure(compound='left')
+        self.param_button.configure(disabledforeground="#a3a3a3")
+        self.param_button.configure(foreground="#000000")
+        self.param_button.configure(highlightbackground="#d9d9d9")
+        self.param_button.configure(highlightcolor="black")
         photo_location = "./painter.png"
         global _img5
         _img5 = tk.PhotoImage(file=photo_location)
-        self.ParamButton.configure(image=_img5)
-        self.ParamButton.configure(pady="0")
-        self.ParamButton.configure(command=lambda: self.open_brush_params())
+        self.param_button.configure(image=_img5)
+        self.param_button.configure(pady="0")
+        self.param_button.configure(command=lambda: self.open_brush_params())
         self.update()
         if self.status == "c":
-            self.name = self.net.Username
+            self.name = self.net.username
             self.top.after(100, lambda: self.client_update())
         else:
             self.name = self.net.client_name
+            self.top.protocol("WM_DELETE_WINDOW", lambda: self.exit_protocol())
             """if self.net.bg_file_destination != '':
                 self.set_as_bg(self.net.bg_file_destination)"""
             self.top.after(100, lambda: self.lobby_update())
 
+    def exit_protocol(self):
+        self.net.exit_protocol()
+        self.top.destroy()
+
     def change_filters(self, time, colour, user):
         # updates self.blacklist
-        for drawing in self.Drawings:
-            if drawing[0] not in self.blacklist:
+        for drawing in self.drawings:
+            if not str(drawing)[1:-1] in str(self.blacklist):
                 if time == 1:
                     drawing_time = drawing[4]
-                    if len(self.FromEntry.get()) > 0:
-                        print("From time: "+str(self.FromEntry.get()))
-                        if drawing_time < float(self.FromEntry.get()):
+                    if len(self.from_entry.get()) > 0:
+                        print("From time: " + str(self.from_entry.get()))
+                        if drawing_time < float(self.from_entry.get()):
                             print(str(drawing) + "Added to blacklist")
                             self.blacklist += drawing
-                    if len(self.ToEntry.get()) > 0:
-                        if drawing_time > float(self.ToEntry.get()):
+                    if len(self.to_entry.get()) > 0:
+                        if drawing_time > float(self.to_entry.get()):
                             print(str(drawing) + "Added to blacklist")
                             self.blacklist += drawing
                 if colour == 1:
@@ -469,7 +473,7 @@ class Toplevel1:
                         self.blacklist += drawing
 
         self.drawn_drawings = []
-        self.Canvas.delete('all')
+        self.canvas.delete('all')
 
     def draw(self, mouse_click):
         """
@@ -488,36 +492,36 @@ class Toplevel1:
         """
         print("Mouse Clicked")
         if mouse_click == 1:
-            self.mouseCoords += [list((self.top.winfo_pointerx()-self.top.winfo_rootx()-self.Canvas.winfo_x(),
-                                       self.top.winfo_pointery()-self.top.winfo_rooty()-self.Canvas.winfo_y()))]
-            if len(self.mouseCoords) == 2 and self.brush != "poly" and self.brush != "lineC":
+            self.mouse_coords += [list((self.top.winfo_pointerx() - self.top.winfo_rootx() - self.canvas.winfo_x(),
+                                        self.top.winfo_pointery() - self.top.winfo_rooty() - self.canvas.winfo_y()))]
+            if len(self.mouse_coords) == 2 and self.brush != "poly" and self.brush != "lineC":
                 Drawing = [[self.brush, self.colour, self.fill, self.width,
-                            time.time()-self.start, self.name, self.mouseCoords]]
-                Drawing_string = json.dumps(Drawing)
-                if self.status == "c":  # We're a client
-                    self.net.my_socket.send(("D"+Drawing_string).encode())
-                else:
-                    self.net.update_clients(Drawing_string)
-                self.Drawings += Drawing
-                self.mouseCoords = []
-        if mouse_click == 2:
-            if self.brush == "poly" or self.brush == "lineC":
-                Drawing = [[self.brush, self.colour, self.fill, self.width,
-                            time.time()-self.start, self.name, self.mouseCoords]]
+                            time.time() - self.start, self.name, self.mouse_coords]]
                 Drawing_string = json.dumps(Drawing)
                 if self.status == "c":  # We're a client
                     self.net.my_socket.send(("D" + Drawing_string).encode())
                 else:
                     self.net.update_clients(Drawing_string)
-                self.Drawings += Drawing
-                self.mouseCoords = []
+                self.drawings += Drawing
+                self.mouse_coords = []
+        if mouse_click == 2:
+            if self.brush == "poly" or self.brush == "lineC":
+                Drawing = [[self.brush, self.colour, self.fill, self.width,
+                            time.time() - self.start, self.name, self.mouse_coords]]
+                Drawing_string = json.dumps(Drawing)
+                if self.status == "c":  # We're a client
+                    self.net.my_socket.send(("D" + Drawing_string).encode())
+                else:
+                    self.net.update_clients(Drawing_string)
+                self.drawings += Drawing
+                self.mouse_coords = []
 
     def update(self):
         """
         This function renders all drawings in the self.drawings list that arent already drawn
         """
-        print("Blacklist: "+str(self.blacklist))
-        print("Drawn Drawings: "+str(self.drawn_drawings))
+        print("Blacklist: " + str(self.blacklist))
+        print("Drawn Drawings: " + str(self.drawn_drawings))
         if self.all_filter_var.get() == 1:
             self.user_var.set(1)
             self.colour_var.set(1)
@@ -526,25 +530,28 @@ class Toplevel1:
         if self.user_var.get() == 1 or self.colour_var.get() == 1 or self.time_var.get() == 1:
             print("Changing Filters")
             self.change_filters(user=self.user_var.get(), colour=self.colour_var.get(), time=self.time_var.get())
-        self.Drawings = [self.Drawings[x] for x in range(len(self.Drawings)) if not(self.Drawings[x] in self.Drawings[:x])]
+        self.drawings = [self.drawings[x] for x in range(len(self.drawings)) if
+                         not (self.drawings[x] in self.drawings[:x])]
         print("Drawing...")
-        print(self.Drawings)
-        for drawing in self.Drawings:
-            if drawing[0] not in self.drawn_drawings and drawing[0] not in self.blacklist:
+        print(self.drawings)
+        for drawing in self.drawings:
+            if not str(drawing)[1:-1] in str(self.drawn_drawings) and not str(drawing)[1:-1] in str(self.blacklist):
                 # New drawing, draw it
                 print(str(drawing) + "Drawn")
                 b = drawing[0]  # brush
                 if b == "oval":
-                    self.Canvas.create_oval(drawing[-1:][0], fill=drawing[2], outline=drawing[1], width=drawing[3])
+                    self.canvas.create_oval(drawing[-1:][0], fill=drawing[2], outline=drawing[1], width=drawing[3])
                 if b == "rect":
-                    self.Canvas.create_rectangle(drawing[-1:][0], fill=drawing[2], outline=drawing[1], width=drawing[3])
+                    self.canvas.create_rectangle(drawing[-1:][0], fill=drawing[2], outline=drawing[1], width=drawing[3])
                 if b == "lineS":
-                    self.Canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3])
+                    self.canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3])
                 if b == "poly":
-                    self.Canvas.create_polygon(drawing[-1:][0], fill=drawing[2], width=drawing[3], outline=drawing[1])
+                    self.canvas.create_polygon(drawing[-1:][0], fill=drawing[2], width=drawing[3], outline=drawing[1])
                 if b == "lineC":
-                    self.Canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3], smooth=True)
+                    self.canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3], smooth=True)
                 self.drawn_drawings += drawing
+            else:
+                print(f"{drawing} not drawn")
         self.blacklist = []
         self.top.after(100, lambda: self.update())
 
@@ -573,9 +580,9 @@ class Toplevel1:
                 # In this case, command is not a command, but part of the drawing,
                 # and as such it should be appended at the start of new_drawing_string
                 new_drawing_string = command + current_socket.recv(4096).decode()
-                print("New Drawing: "+new_drawing_string)
+                print("New Drawing: " + new_drawing_string)
                 new_drawing = json.loads(new_drawing_string)
-                self.Drawings += new_drawing
+                self.drawings += new_drawing
             else:
                 names = current_socket.recv(4096).decode()
                 self.net.parse_connected_clients(names)
@@ -588,7 +595,7 @@ class Toplevel1:
     """
 
     def lobby_update(self):
-        self.Drawings = self.net.get_data()
+        self.drawings = self.net.get_data()
         self.top.after(100, lambda: self.lobby_update())
 
     def changeBrush(self, new_brush):
@@ -606,13 +613,13 @@ class Toplevel1:
     def open_user_filter(self):
         if self.status == "c":
             self.net.get_connected_Clients()
-            self.top.after(100, lambda :self.wait_for_clients_user_list())
+            self.top.after(100, lambda: self.wait_for_clients_user_list())
         else:
             client_list = ast.literal_eval(self.net.send_names())
             print(client_list)
             to = tk.Toplevel(self.top)
             user_filter = UserFilterGUI.Toplevel1(top=to, all_users=client_list, current_users=self.user_filter_list)
-            self.top.after(100, lambda :self.await_user_filter_list(user_filter))
+            self.top.after(100, lambda: self.await_user_filter_list(user_filter))
 
     def wait_for_clients_user_list(self):
         if self.net.changed == 1:
@@ -623,7 +630,7 @@ class Toplevel1:
             user_filter = UserFilterGUI.Toplevel1(top=to, all_users=client_list, current_users=self.user_filter_list)
             self.top.after(100, lambda: self.await_user_filter_list(user_filter))
         else:
-            self.top.after(100, lambda :self.wait_for_clients_user_list())
+            self.top.after(100, lambda: self.wait_for_clients_user_list())
 
     def await_user_filter_list(self, user_gui):
         self.user_filter_list = user_gui.user_list
@@ -631,16 +638,18 @@ class Toplevel1:
 
     def open_brush_params(self):
         to = tk.Toplevel(self.top)
-        brush_select = BrushSelectGUI.Toplevel1(top=to, outline_colour=self.colour, fill_colour=self.fill, width=self.width)
-        self.top.after(100, lambda :self.await_brush_change(brush_select))
+        brush_select = BrushSelectGUI.Toplevel1(top=to, outline_colour=self.colour, fill_colour=self.fill,
+                                                width=self.width)
+        self.top.after(100, lambda: self.await_brush_change(brush_select))
 
     def await_brush_change(self, t):
         if t.Changed == 1:
-            self.width = t.Width
-            self.fill = t.FillC
-            self.colour = t.LineC
+            self.width = t.width
+            self.fill = t.fill_c
+            self.colour = t.line_c
             t.Changed = 0
-        self.top.after(100, lambda :self.await_brush_change(t))
+        self.top.after(100, lambda: self.await_brush_change(t))
+
 
 """class SvgImage(tk.PhotoImage):
     Widget which can display images in PGM, PPM, GIF, PNG format.
