@@ -60,6 +60,14 @@ class webserver:
             file_name_list = os.listdir("database")
             print(file_name_list)
             return "D"+json.dumps(file_name_list)
+        if directive == "V":  # A client asked us for a file, send it
+            file_name = message[1:]
+            file = open("database/"+file_name, 'r')
+            file_string = file.read()
+            file_string = file_string.replace("'", '"')
+            print(file_string)
+            file.close()
+            return "V" + str(file_string)
         else:
             return "message: " + message + ". Received"
 

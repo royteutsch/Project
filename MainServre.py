@@ -101,7 +101,6 @@ class Server:
             current_socket.close()
         else:
             directive = command
-            # TODO: ADD COMMANDS "M" (NEW "M"EMBER, REQUESTED FROM WEBSITE)
             if directive == "M":  # The web server asked us to Make a new account
                 params = current_socket.recv(1024).decode().split("|")
                 print("new user params: " + str(params))

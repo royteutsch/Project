@@ -3,7 +3,7 @@ This is the script used by all web pages of the project
 
 md5 encryption: https://github.com/blueimp/JavaScript-MD5
 */
-const web_server = new WebSocket("ws://127.0.0.1:5678/");
+const web_server = new WebSocket("ws://"+sessionStorage.getItem("server_ip")+":5678/");
 var message;
 console.log(web_server);
 var username;
@@ -42,6 +42,70 @@ web_server.onmessage = function(event){
         var element = document.getElementById("drawing_loading_button");
         document.body.removeChild(element)
     }
+    if (directive == "V") {  // We asked for a file, and the server returned it to us, add the drawings to the canvas
+        var file_string = response.slice(1);
+        var list_of_drawings = JSON.parse(file_string);
+        var my_canvas = document.getElementById("my_canvas");
+        var ctx = my_canvas.getContext("2d");
+        console.log(list_of_drawings)
+        for (let index = 1; index < list_of_drawings.length; index++) {
+            var drawing = list_of_drawings[index];
+            console.log(drawing)
+            var brush = drawing[0];
+            ctx.lineWidth = drawing[3]
+            ctx.fillStyle = drawing[2]
+            ctx.strokeStyle = drawing[1]
+            if (brush == "oval") {
+                var start_x = drawing[-1][0][0];
+                var start_y = drawing[-1][0][1];
+                var end_x = drawing[-1][1][0];
+                var end_y = drawing[-1][1][1];
+                ctx.ellipse((start_x+end_x)/2, (start_y+end_y)/2, (start_x-end_x)/2, (start_y-end_y)/2, 0, 0, Math.PI*2);
+                ctx.fill();
+                ctx.stroke();
+            }
+            if (brush == "rect") {
+                var start_x = drawing[-1][0][0];
+                var start_y = drawing[-1][0][1];
+                var end_x = drawing[-1][1][0];
+                var end_y = drawing[-1][1][1];
+                ctx.fillRect(start_x, start_y, end_x-start_x, end_y-start_y);
+                ctx.strokeRect(start_x, start_y, end_x-start_x, end_y-start_y);
+            }
+            if (brush == "lineS") {
+                var start_x = drawing[-1][0][0];
+                var start_y = drawing[-1][0][1];
+                var end_x = drawing[-1][1][0];
+                var end_y = drawing[-1][1][1];
+                ctx.beginPath();
+                ctx.moveTo(start_x, start_y);
+                ctx.lineTo(end_x, end_y);
+                ctx.stroke();
+                ctx.closePath();
+            }
+            if (brush == "poly") {
+                ctx.beginPath();
+                ctx.moveTo(drawing[-1][0][0], drawing[-1][0][1])
+                for (let index = 1; index < drawing[-1].length; index++) {
+                    ctx.lineTo(drawing[-1][index][0], drawing[-1][index][1]);
+                }
+                ctx.fill();
+                ctx.stroke();
+            }
+            if (brush == "lineC") {
+                // Used from here: https://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
+                ctx.beginPath();
+                ctx.moveTo(drawing[-1][0][0], drawing[-1][0][1])
+                for (let index = 1; index < drawing[-1].length - 2; index++) {
+                    var xc = (drawing[-1][index][0] + drawing[-1][index + 1][0]) / 2;
+                    var yc = (drawing[-1][index][1] + drawing[-1][index + 1][1]) / 2;
+                    ctx.quadraticCurveTo(drawing[-1][index][0], drawing[-1][index][1], xc, yc);
+                }
+                ctx.quadraticCurveTo(drawing[-1][index][0], drawing[-1][index][1], drawing[-1][index+1][0],drawing[-1][index+1][1]);
+                ctx.stroke();
+            }
+        }
+    }
 };
 
 function open_file(button_clicked){
@@ -53,11 +117,11 @@ function open_file(button_clicked){
 function send(){
     message = document.getElementById("test_entry").value;
     try {
-        web_server.send(message);
-    } catch {
-
+        web_server.send(message);  
+        console.log("Msg sent ", message);
+    } catch (error){
+console.log(error);
     }
-    console.log("Msg sent ", message);
     }
 
 function load(){
@@ -66,10 +130,11 @@ function load(){
     message = "D";
     try {
         web_server.send(message);
-    } catch {
-
+        console.log("Msg sent", message);
+    } catch (error){
+        console.log(error);
     }
-    console.log("Msg sent", message);
+    
     }  
 
 function connect(){
@@ -81,10 +146,11 @@ function connect(){
     message = "C" + username + "|" + enc_pass;
     try {
         web_server.send(message);
-    } catch {
-
+        console.log("Msg sent", message);
+    } catch (error){
+        console.log(error);
     }
-    console.log("Msg sent", message);
+    
     }
 
 function create(){
@@ -96,11 +162,24 @@ function create(){
     message = "M" + new_username + "|" + new_enc_pass;
     try {
         web_server.send(message);
-    } catch {
-
+        console.log("Msg sent", message);
+    } catch (error){
+        console.log(error);
     }
-    console.log("Msg sent", message);
+    
     sessionStorage.setItem("user_name", "None");
+}
+
+function view(){
+    // Asks the webserver to send us the full file we want to view, and then draw it drawing by drawing
+    message = "V" + sessionStorage.getItem("viewed_file") + ".txt";
+    try {
+        web_server.send(message);
+        console.log("Msg sent", message);
+    } catch (error){
+        console.log(error);
+    }
+    
 }
 
 /*
