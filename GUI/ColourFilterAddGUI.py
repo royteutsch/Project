@@ -34,92 +34,92 @@ class Toplevel1:
         self.top = top
         self.colour_rgb = (255, 255, 255)
         self.colour_hex = '#000000'
-        self.colourR = tk.StringVar(value=255)
-        self.colourG = tk.StringVar(value=255)
-        self.colourB = tk.StringVar(value=255)
+        self.colour_R = tk.StringVar(value=255)
+        self.colour_G = tk.StringVar(value=255)
+        self.colour_B = tk.StringVar(value=255)
         self.final_colour = ''
 
-        self.AddColourFilterLabel = tk.Label(self.top)
-        self.AddColourFilterLabel.place(relx=0.021, rely=0.067, height=101
-                                        , width=454)
-        self.AddColourFilterLabel.configure(anchor='w')
-        self.AddColourFilterLabel.configure(background='#d9d9d9')
-        self.AddColourFilterLabel.configure(compound='left')
-        self.AddColourFilterLabel.configure(disabledforeground="#a3a3a3")
-        self.AddColourFilterLabel.configure(font="-family {David} -size 24")
-        self.AddColourFilterLabel.configure(foreground="#000000")
-        self.AddColourFilterLabel.configure(text='''(         ,         ,         )  Prev:''')
+        self.add_colour_filter_label = tk.Label(self.top)
+        self.add_colour_filter_label.place(relx=0.021, rely=0.067, height=101
+                                           , width=454)
+        self.add_colour_filter_label.configure(anchor='w')
+        self.add_colour_filter_label.configure(background='#d9d9d9')
+        self.add_colour_filter_label.configure(compound='left')
+        self.add_colour_filter_label.configure(disabledforeground="#a3a3a3")
+        self.add_colour_filter_label.configure(font="-family {David} -size 24")
+        self.add_colour_filter_label.configure(foreground="#000000")
+        self.add_colour_filter_label.configure(text='''(         ,         ,         )  Prev:''')
 
-        self.FilterRValueEntry = tk.Entry(self.top)
-        self.FilterRValueEntry.place(relx=0.063, rely=0.201, height=60
-                                     , relwidth=0.092)
-        self.FilterRValueEntry.configure(background="white")
-        self.FilterRValueEntry.configure(disabledforeground="#a3a3a3")
-        self.FilterRValueEntry.configure(font="TkFixedFont")
-        self.FilterRValueEntry.configure(foreground="#000000")
-        self.FilterRValueEntry.configure(insertbackground="black")
-        self.FilterRValueEntry.configure(textvariable=self.colourR)
+        self.filter_R_value_entry = tk.Entry(self.top)
+        self.filter_R_value_entry.place(relx=0.063, rely=0.201, height=60
+                                        , relwidth=0.092)
+        self.filter_R_value_entry.configure(background="white")
+        self.filter_R_value_entry.configure(disabledforeground="#a3a3a3")
+        self.filter_R_value_entry.configure(font="TkFixedFont")
+        self.filter_R_value_entry.configure(foreground="#000000")
+        self.filter_R_value_entry.configure(insertbackground="black")
+        self.filter_R_value_entry.configure(textvariable=self.colour_R)
 
-        self.FilterGValueEntry = tk.Entry(self.top)
-        self.FilterGValueEntry.place(relx=0.208, rely=0.201, height=60
-                                     , relwidth=0.092)
-        self.FilterGValueEntry.configure(background="white")
-        self.FilterGValueEntry.configure(disabledforeground="#a3a3a3")
-        self.FilterGValueEntry.configure(font="TkFixedFont")
-        self.FilterGValueEntry.configure(foreground="#000000")
-        self.FilterGValueEntry.configure(insertbackground="black")
-        self.FilterGValueEntry.configure(textvariable=self.colourG)
+        self.filter_G_value_entry = tk.Entry(self.top)
+        self.filter_G_value_entry.place(relx=0.208, rely=0.201, height=60
+                                        , relwidth=0.092)
+        self.filter_G_value_entry.configure(background="white")
+        self.filter_G_value_entry.configure(disabledforeground="#a3a3a3")
+        self.filter_G_value_entry.configure(font="TkFixedFont")
+        self.filter_G_value_entry.configure(foreground="#000000")
+        self.filter_G_value_entry.configure(insertbackground="black")
+        self.filter_G_value_entry.configure(textvariable=self.colour_G)
 
-        self.FilterBValueEntry = tk.Entry(self.top)
-        self.FilterBValueEntry.place(relx=0.354, rely=0.201, height=60
-                                     , relwidth=0.092)
-        self.FilterBValueEntry.configure(background="white")
-        self.FilterBValueEntry.configure(disabledforeground="#a3a3a3")
-        self.FilterBValueEntry.configure(font="TkFixedFont")
-        self.FilterBValueEntry.configure(foreground="#000000")
-        self.FilterBValueEntry.configure(insertbackground="black")
-        self.FilterBValueEntry.configure(textvariable=self.colourB)
+        self.filter_B_value_entry = tk.Entry(self.top)
+        self.filter_B_value_entry.place(relx=0.354, rely=0.201, height=60
+                                        , relwidth=0.092)
+        self.filter_B_value_entry.configure(background="white")
+        self.filter_B_value_entry.configure(disabledforeground="#a3a3a3")
+        self.filter_B_value_entry.configure(font="TkFixedFont")
+        self.filter_B_value_entry.configure(foreground="#000000")
+        self.filter_B_value_entry.configure(insertbackground="black")
+        self.filter_B_value_entry.configure(textvariable=self.colour_B)
 
-        self.FilterColourPreview = tk.Canvas(self.top)
-        self.FilterColourPreview.place(relx=0.667, rely=0.134, relheight=0.557
-                                       , relwidth=0.194)
-        self.FilterColourPreview.configure(background="#d9d9d9")
-        self.FilterColourPreview.configure(borderwidth="2")
-        self.FilterColourPreview.configure(insertbackground="black")
-        self.FilterColourPreview.configure(relief="ridge")
-        self.FilterColourPreview.configure(selectbackground="blue")
-        self.FilterColourPreview.configure(selectforeground="white")
+        self.filter_colour_preview = tk.Canvas(self.top)
+        self.filter_colour_preview.place(relx=0.667, rely=0.134, relheight=0.557
+                                         , relwidth=0.194)
+        self.filter_colour_preview.configure(background="#d9d9d9")
+        self.filter_colour_preview.configure(borderwidth="2")
+        self.filter_colour_preview.configure(insertbackground="black")
+        self.filter_colour_preview.configure(relief="ridge")
+        self.filter_colour_preview.configure(selectbackground="blue")
+        self.filter_colour_preview.configure(selectforeground="white")
 
-        self.ColourAddButton = tk.Button(self.top)
-        self.ColourAddButton.place(relx=0.063, rely=0.671, height=44, width=187)
-        self.ColourAddButton.configure(activebackground="#ececec")
-        self.ColourAddButton.configure(activeforeground="#000000")
-        self.ColourAddButton.configure(background="#d9d9d9")
-        self.ColourAddButton.configure(compound='left')
-        self.ColourAddButton.configure(disabledforeground="#a3a3a3")
-        self.ColourAddButton.configure(font="-family {David} -size 24")
-        self.ColourAddButton.configure(foreground="#000000")
-        self.ColourAddButton.configure(highlightbackground="#d9d9d9")
-        self.ColourAddButton.configure(highlightcolor="black")
-        self.ColourAddButton.configure(pady="0")
-        self.ColourAddButton.configure(text='''Add/Remove''')
-        self.ColourAddButton.configure(command=lambda: self.decide_on_colour())
+        self.colour_add_button = tk.Button(self.top)
+        self.colour_add_button.place(relx=0.063, rely=0.671, height=44, width=187)
+        self.colour_add_button.configure(activebackground="#ececec")
+        self.colour_add_button.configure(activeforeground="#000000")
+        self.colour_add_button.configure(background="#d9d9d9")
+        self.colour_add_button.configure(compound='left')
+        self.colour_add_button.configure(disabledforeground="#a3a3a3")
+        self.colour_add_button.configure(font="-family {David} -size 24")
+        self.colour_add_button.configure(foreground="#000000")
+        self.colour_add_button.configure(highlightbackground="#d9d9d9")
+        self.colour_add_button.configure(highlightcolor="black")
+        self.colour_add_button.configure(pady="0")
+        self.colour_add_button.configure(text='''Add/Remove''')
+        self.colour_add_button.configure(command=lambda: self.decide_on_colour())
 
         self.top.after(100, lambda: self.update_colour())
 
     def regulate_colours(self):
-        if int(self.colourR.get()) > 255:
-            self.colourR.set(value=255)
-        if int(self.colourR.get()) < 0:
-            self.colourR.set(value=0)
-        if int(self.colourG.get()) > 255:
-            self.colourG.set(value=255)
-        if int(self.colourG.get()) < 0:
-            self.colourG.set(value=0)
-        if int(self.colourB.get()) > 255:
-            self.colourB.set(value=255)
-        if int(self.colourB.get()) < 0:
-            self.colourB.set(value=0)
+        if int(self.colour_R.get()) > 255:
+            self.colour_R.set(value=255)
+        if int(self.colour_R.get()) < 0:
+            self.colour_R.set(value=0)
+        if int(self.colour_G.get()) > 255:
+            self.colour_G.set(value=255)
+        if int(self.colour_G.get()) < 0:
+            self.colour_G.set(value=0)
+        if int(self.colour_B.get()) > 255:
+            self.colour_B.set(value=255)
+        if int(self.colour_B.get()) < 0:
+            self.colour_B.set(value=0)
 
     def rgb_to_hex(self, rgb: Tuple[int, int, int]) -> str:
         return '#' + '%02x%02x%02x' % rgb
@@ -132,17 +132,17 @@ class Toplevel1:
             return False
 
     def update_colour(self):
-        if self.is_num(self.colourR) and self.is_num(self.colourG) and self.is_num(self.colourB):
+        if self.is_num(self.colour_R) and self.is_num(self.colour_G) and self.is_num(self.colour_B):
             self.regulate_colours()
-            self.colour_rgb = (int(self.colourR.get()), int(self.colourG.get()), int(self.colourB.get()))
+            self.colour_rgb = (int(self.colour_R.get()), int(self.colour_G.get()), int(self.colour_B.get()))
             self.colour_hex = self.rgb_to_hex(self.colour_rgb)
-            self.FilterColourPreview.configure(background=self.colour_hex)
+            self.filter_colour_preview.configure(background=self.colour_hex)
         self.top.after(100, lambda: self.update_colour())
 
     def decide_on_colour(self):
-        if self.is_num(self.colourR) and self.is_num(self.colourG) and self.is_num(self.colourB):
+        if self.is_num(self.colour_R) and self.is_num(self.colour_G) and self.is_num(self.colour_B):
             self.regulate_colours()
-            self.colour_rgb = (int(self.colourR.get()), int(self.colourB.get()), int(self.colourG.get()))
+            self.colour_rgb = (int(self.colour_R.get()), int(self.colour_B.get()), int(self.colour_G.get()))
             self.final_colour = self.rgb_to_hex(self.colour_rgb)
 
 # def start_up():

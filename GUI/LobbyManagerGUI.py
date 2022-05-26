@@ -37,7 +37,7 @@ class Toplevel1(GUI):
         top.title("Toplevel 0")
         top.configure(background="#d9d9d9")
 
-        self.SecStatus = "Public"
+        self.sec_status = "Public"
         self.users = []
         self.users_string = ""
         self.user_list_text_variable = tk.StringVar()
@@ -47,10 +47,10 @@ class Toplevel1(GUI):
             self.client = params[2]
 
         if params[1].get():
-            self.SecStatus = "Private"
+            self.sec_status = "Private"
 
         if params[0].get():
-            self.LobbyName = params[0].get()
+            self.lobby_name = params[0].get()
 
         self.top = top
 
@@ -58,16 +58,16 @@ class Toplevel1(GUI):
             print("Initiating Lobby")
             self.top.after(100, self.initiate_lobby(params[0].get(), params[1].get()))
 
-        self.LobbyName = tk.Label(self.top)
-        self.LobbyName.place(relx=0.025, rely=0.044, height=41, width=600)
-        self.LobbyName.configure(anchor='w')
-        self.LobbyName.configure(background="#d9d9d9")
-        self.LobbyName.configure(compound='left')
-        self.LobbyName.configure(disabledforeground="#a3a3a3")
-        self.LobbyName.configure(font="-family {David} -size 18")
-        self.LobbyName.configure(foreground="#000000")
-        self.LobbyName.configure(text='''Name: ''' + params[0].get())
-        self.widgets.append(self.LobbyName)
+        self.lobby_name_label = tk.Label(self.top)
+        self.lobby_name_label.place(relx=0.025, rely=0.044, height=41, width=600)
+        self.lobby_name_label.configure(anchor='w')
+        self.lobby_name_label.configure(background="#d9d9d9")
+        self.lobby_name_label.configure(compound='left')
+        self.lobby_name_label.configure(disabledforeground="#a3a3a3")
+        self.lobby_name_label.configure(font="-family {David} -size 18")
+        self.lobby_name_label.configure(foreground="#000000")
+        self.lobby_name_label.configure(text='''Name: ''' + params[0].get())
+        self.widgets.append(self.lobby_name_label)
 
         self.lobbyIDLabel = tk.Label(self.top)
         self.lobbyIDLabel.place(relx=0.309, rely=0.156, height=101, width=314)
@@ -88,7 +88,7 @@ class Toplevel1(GUI):
         self.SecLabel.configure(disabledforeground="#a3a3a3")
         self.SecLabel.configure(font="-family {David} -size 18")
         self.SecLabel.configure(foreground="#000000")
-        self.SecLabel.configure(text='''Security: ''' + self.SecStatus)
+        self.SecLabel.configure(text='''Security: ''' + self.sec_status)
         self.widgets.append(self.SecLabel)
 
         self.UserListLabel = tk.Label(self.top)

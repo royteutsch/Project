@@ -52,33 +52,34 @@ web_server.onmessage = function(event){
             var drawing = list_of_drawings[index];
             console.log(drawing)
             var brush = drawing[0];
+            var mouse_coords = drawing.length - 1 // First number is to find the coord, second is to dictate x or y
             ctx.lineWidth = drawing[3]
             ctx.fillStyle = drawing[2]
             ctx.strokeStyle = drawing[1]
             if (brush == "oval") {
                 ctx.beginPath();
-                var start_x = drawing[drawing.length - 1][0][0];
-                var start_y = drawing[drawing.length - 1][0][1];
-                var end_x = drawing[drawing.length - 1][1][0];
-                var end_y = drawing[drawing.length - 1][1][1];
+                var start_x = drawing[mouse_coords][0][0];
+                var start_y = drawing[mouse_coords][0][1];
+                var end_x = drawing[mouse_coords][1][0];
+                var end_y = drawing[mouse_coords][1][1];
                 ctx.ellipse((start_x+end_x)/2, (start_y+end_y)/2, (end_x-start_x)/2, (end_y-start_y)/2, 0, 0, Math.PI*2);
                 ctx.fill();
                 ctx.stroke();
                 ctx.closePath();
             }
             if (brush == "rect") {
-                var start_x = drawing[drawing.length - 1][0][0];
-                var start_y = drawing[drawing.length - 1][0][1];
-                var end_x = drawing[drawing.length - 1][1][0];
-                var end_y = drawing[drawing.length - 1][1][1];
+                var start_x = drawing[mouse_coords][0][0];
+                var start_y = drawing[mouse_coords][0][1];
+                var end_x = drawing[mouse_coords][1][0];
+                var end_y = drawing[mouse_coords][1][1];
                 ctx.fillRect(start_x, start_y, end_x-start_x, end_y-start_y);
                 ctx.strokeRect(start_x, start_y, end_x-start_x, end_y-start_y);
             }
             if (brush == "lineS") {
-                var start_x = drawing[drawing.length - 1][0][0];
-                var start_y = drawing[drawing.length - 1][0][1];
-                var end_x = drawing[drawing.length - 1][1][0];
-                var end_y = drawing[drawing.length - 1][1][1];
+                var start_x = drawing[mouse_coords][0][0];
+                var start_y = drawing[mouse_coords][0][1];
+                var end_x = drawing[mouse_coords][1][0];
+                var end_y = drawing[mouse_coords][1][1];
                 ctx.beginPath();
                 ctx.moveTo(start_x, start_y);
                 ctx.lineTo(end_x, end_y);
@@ -87,11 +88,11 @@ web_server.onmessage = function(event){
             }
             if (brush == "poly") {
                 ctx.beginPath();
-                ctx.moveTo(drawing[drawing.length - 1][0][0], drawing[drawing.length - 1][0][1])
-                for (let index = 1; index < drawing[drawing.length - 1].length; index++) {
-                    ctx.lineTo(drawing[drawing.length - 1][index][0], drawing[drawing.length - 1][index][1]);
+                ctx.moveTo(drawing[mouse_coords][0][0], drawing[mouse_coords][0][1])
+                for (let index = 1; index < drawing[mouse_coords].length; index++) {
+                    ctx.lineTo(drawing[mouse_coords][index][0], drawing[mouse_coords][index][1]);
                 }
-                ctx.lineTo(drawing[drawing.length - 1][0][0], drawing[drawing.length - 1][0][1])
+                ctx.lineTo(drawing[mouse_coords][0][0], drawing[mouse_coords][0][1])
                 ctx.fill();
                 ctx.stroke();
                 ctx.closePath();
@@ -99,13 +100,15 @@ web_server.onmessage = function(event){
             if (brush == "lineC") {
                 // Used from here: https://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
                 ctx.beginPath();
-                ctx.moveTo(drawing[drawing.length - 1][0][0], drawing[drawing.length - 1][0][1])
-                for (let index = 1; index < drawing[drawing.length - 1].length - 2; index++) {
-                    var xc = (drawing[drawing.length - 1][index][0] + drawing[drawing.length - 1][index + 1][0]) / 2;
-                    var yc = (drawing[drawing.length - 1][index][1] + drawing[drawing.length - 1][index + 1][1]) / 2;
-                    ctx.quadraticCurveTo(drawing[drawing.length - 1][index][0], drawing[drawing.length - 1][index][1], xc, yc);
+                ctx.moveTo(drawing[mouse_coords][0][0], drawing[mouse_coords][0][1])
+                let index = 1;
+                for (index = 1; index < drawing[mouse_coords].length - 2; index++) {
+                    var xc = (drawing[mouse_coords][index][0] + drawing[mouse_coords][index + 1][0]) / 2;
+                    var yc = (drawing[mouse_coords][index][1] + drawing[mouse_coords][index + 1][1]) / 2;
+                    ctx.quadraticCurveTo(drawing[mouse_coords][index][0], drawing[mouse_coords][index][1], xc, yc);
                 }
-                ctx.quadraticCurveTo(drawing[drawing.length - 1][index][0], drawing[drawing.length - 1][index][1], drawing[drawing.length - 1][index+1][0],drawing[drawing.length - 1][index+1][1]);
+                ctx.quadraticCurveTo(drawing[mouse_coords][index][0], drawing[mouse_coords][index][1],
+                                    drawing[mouse_coords][index+1][0],drawing[mouse_coords][index+1][1]);
                 ctx.stroke();
                 ctx.closePath();
             }
