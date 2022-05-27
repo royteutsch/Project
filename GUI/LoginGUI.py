@@ -140,7 +140,7 @@ class Toplevel1(GUI):
         self.breate_Button.configure(pady="0")
         self.breate_Button.configure(text='''Create New User''')
         self.breate_Button.configure(command=lambda:
-        webbrowser.open('file:///' + os.path.dirname(os.getcwd()) + '/' + 'web_main.html'))
+        webbrowser.open('file:///' + os.path.dirname(os.getcwd()) + '/' + 'web_start.html'))
         self.widgets.append(self.breate_Button)
 
     def connect_to_user(self, Username, Password, ip, port):
