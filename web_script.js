@@ -62,7 +62,7 @@ web_server.onmessage = function(event){
                 var start_y = drawing[mouse_coords][0][1];
                 var end_x = drawing[mouse_coords][1][0];
                 var end_y = drawing[mouse_coords][1][1];
-                ctx.ellipse((start_x+end_x)/2, (start_y+end_y)/2, (end_x-start_x)/2, (end_y-start_y)/2, 0, 0, Math.PI*2);
+                ctx.ellipse((start_x+end_x)/2, (start_y+end_y)/2, Math.abs((end_x-start_x)/2), Math.abs((end_y-start_y)/2), 0, 0, Math.PI*2);
                 ctx.fill();
                 ctx.stroke();
                 ctx.closePath();
