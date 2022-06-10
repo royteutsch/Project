@@ -62,7 +62,7 @@ class Toplevel1:
             strvar += str(item) + " "
         strvar = strvar[:-1]
         listvar = tk.StringVar(value=strvar)
-        print(listvar.get())
+        logging.info(listvar.get())
         return listvar
 
 # The following code is added to facilitate the Scrolled widgets you specified.

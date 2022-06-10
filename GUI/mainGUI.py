@@ -11,6 +11,7 @@ import time
 import tkinter
 import tkinter as tk
 import json
+import logging
 # from svglib.svglib import svg2rlg
 # from reportlab.graphics import renderPDF, renderPM
 # from PIL import Image, ImageTk
@@ -453,23 +454,23 @@ class Toplevel1:
                 if time == 1:
                     drawing_time = drawing[4]
                     if len(self.from_entry.get()) > 0:
-                        print("From time: " + str(self.from_entry.get()))
+                        logging.info("From time: " + str(self.from_entry.get()))
                         if drawing_time < float(self.from_entry.get()):
-                            print(str(drawing) + "Added to blacklist")
+                            logging.info(str(drawing) + "Added to blacklist")
                             self.blacklist += drawing
                     if len(self.to_entry.get()) > 0:
                         if drawing_time > float(self.to_entry.get()):
-                            print(str(drawing) + "Added to blacklist")
+                            logging.info(str(drawing) + "Added to blacklist")
                             self.blacklist += drawing
                 if colour == 1:
                     drawing_outline = drawing[1]
                     if drawing_outline in self.colour_filter_list:
-                        print(str(drawing) + "Added to blacklist")
+                        logging.info(str(drawing) + "Added to blacklist")
                         self.blacklist += drawing
                 if user == 1:
                     drawing_user = drawing[5]
                     if drawing_user in self.user_filter_list:
-                        print(str(drawing) + "Added to blacklist")
+                        logging.info(str(drawing) + "Added to blacklist")
                         self.blacklist += drawing
 
         self.drawn_drawings = []
@@ -490,7 +491,7 @@ class Toplevel1:
         In order to know which mouse button was pressed, the mouse_click parameter is used with either 1 or 2 for
         the 2 mouse buttons
         """
-        print("Mouse Clicked")
+        logging.info("Mouse Clicked")
         if mouse_click == 1:
             self.mouse_coords += [list((self.top.winfo_pointerx() - self.top.winfo_rootx() - self.canvas.winfo_x(),
                                         self.top.winfo_pointery() - self.top.winfo_rooty() - self.canvas.winfo_y()))]
@@ -520,24 +521,24 @@ class Toplevel1:
         """
         This function renders all drawings in the self.drawings list that arent already drawn
         """
-        print("Blacklist: " + str(self.blacklist))
-        print("Drawn Drawings: " + str(self.drawn_drawings))
+        logging.info("Blacklist: " + str(self.blacklist))
+        logging.info("Drawn Drawings: " + str(self.drawn_drawings))
         if self.all_filter_var.get() == 1:
             self.user_var.set(1)
             self.colour_var.set(1)
             self.time_var.set(1)
             self.all_filter_var.set(0)
         if self.user_var.get() == 1 or self.colour_var.get() == 1 or self.time_var.get() == 1:
-            print("Changing Filters")
+            logging.info("Changing Filters")
             self.change_filters(user=self.user_var.get(), colour=self.colour_var.get(), time=self.time_var.get())
         self.drawings = [self.drawings[x] for x in range(len(self.drawings)) if
                          not (self.drawings[x] in self.drawings[:x])]
-        print("Drawing...")
-        print(self.drawings)
+        logging.info("Drawing...")
+        logging.info(self.drawings)
         for drawing in self.drawings:
             if not str(drawing)[1:-1] in str(self.drawn_drawings) and not str(drawing)[1:-1] in str(self.blacklist):
                 # New drawing, draw it
-                print(str(drawing) + "Drawn")
+                logging.info(str(drawing) + "Drawn")
                 b = drawing[0]  # brush
                 if b == "oval":
                     self.canvas.create_oval(drawing[-1:][0], fill=drawing[2], outline=drawing[1], width=drawing[3])
@@ -551,7 +552,7 @@ class Toplevel1:
                     self.canvas.create_line(drawing[-1:][0], fill=drawing[1], width=drawing[3], smooth=True)
                 self.drawn_drawings += drawing
             else:
-                print(f"{drawing} not drawn")
+                logging.info(f"{drawing} not drawn")
         self.blacklist = []
         self.top.after(100, lambda: self.update())
 
@@ -573,14 +574,14 @@ class Toplevel1:
                         break
                     data = current_socket.recv(9999)
                     f.write(data)
-                    print("handling...")
+                    logging.info("handling...")
                     message_length -= 9999
                 f.close()
             elif command != "L":
                 # In this case, command is not a command, but part of the drawing,
                 # and as such it should be appended at the start of new_drawing_string
                 new_drawing_string = command + current_socket.recv(4096).decode()
-                print("New Drawing: " + new_drawing_string)
+                logging.info("New Drawing: " + new_drawing_string)
                 new_drawing = json.loads(new_drawing_string)
                 self.drawings += new_drawing
             else:
@@ -616,7 +617,7 @@ class Toplevel1:
             self.top.after(100, lambda: self.wait_for_clients_user_list())
         else:
             client_list = ast.literal_eval(self.net.send_names())
-            print(client_list)
+            logging.info(client_list)
             to = tk.Toplevel(self.top)
             user_filter = UserFilterGUI.Toplevel1(top=to, all_users=client_list, current_users=self.user_filter_list)
             self.top.after(100, lambda: self.await_user_filter_list(user_filter))
@@ -625,7 +626,7 @@ class Toplevel1:
         if self.net.changed == 1:
             self.net.changed = 0
             client_list = self.net.client_name_list
-            print(client_list)
+            logging.info(client_list)
             to = tk.Toplevel(self.top)
             user_filter = UserFilterGUI.Toplevel1(top=to, all_users=client_list, current_users=self.user_filter_list)
             self.top.after(100, lambda: self.await_user_filter_list(user_filter))

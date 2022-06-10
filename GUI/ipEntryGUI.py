@@ -9,13 +9,13 @@ import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
-
+import logging
 from GUI import LoginGUI
 from GUI.BaselineGUI import GUI
 
 
 class Toplevel1(GUI):
-    def __init__(self, top=None):
+    def __init__(self, top=None, disable=False):
         super(Toplevel1, self).__init__()
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
@@ -31,6 +31,9 @@ class Toplevel1(GUI):
         top.resizable(1,  1)
         top.title("Toplevel 0")
         top.configure(background="#d9d9d9")
+
+        if disable is True:
+            logging.disable(logging.INFO)
 
         self.top = top
         self.port = 5555
@@ -75,7 +78,7 @@ class Toplevel1(GUI):
 
     def check_for_server_ip(self):
         self.ip_address = self.ip.get()
-        print(self.ip_address)
+        logging.info(self.ip_address)
         try:
             self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.my_socket.connect((self.ip_address, self.port))
@@ -84,10 +87,14 @@ class Toplevel1(GUI):
         else:
             self.replaceGUI(LoginGUI, self.top, [self.ip.get(), self.port])
 
+
 def main():
+    disable_prompt = input("To Disable Info Prompts, enter 'Y'. Otherwise, enter any other character")
+    disable_info = disable_prompt == "Y"
     root = tk.Tk()
-    t = Toplevel1(root)
+    t = Toplevel1(root, disable_info)
     root.mainloop()
+
 
 if __name__ == '__main__':
     main()

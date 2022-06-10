@@ -9,7 +9,7 @@ import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
-
+import logging
 # import ColourAddGUI_support
 from typing import Tuple
 
@@ -238,8 +238,8 @@ class Toplevel1:
         return tuple(rgb)
 
     def rgb_to_hex(self, rgb: Tuple[int, int, int]) -> str:
-        print(str(rgb))
-        print('#'+'%02x%02x%02x' % rgb)
+        logging.info(str(rgb))
+        logging.info('#'+'%02x%02x%02x' % rgb)
         return '#' + '%02x%02x%02x' % rgb
 
     def apply_colour(self):

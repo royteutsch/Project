@@ -10,7 +10,7 @@ from tkinter import filedialog
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
-
+import logging
 # import LobbyManagerGUI_support
 import Client
 from GUI import mainGUI, LobbyUserListGUI
@@ -55,7 +55,7 @@ class Toplevel1(GUI):
         self.top = top
 
         if params is not None:
-            print("Initiating Lobby")
+            logging.info("Initiating Lobby")
             self.top.after(100, self.initiate_lobby(params[0].get(), params[1].get()))
 
         self.lobby_name_label = tk.Label(self.top)
@@ -169,7 +169,7 @@ class Toplevel1(GUI):
 
     def run_lobby_loop(self):
         self.lobby.one_loop()
-        print("looping on lobby")
+        logging.info("looping on lobby")
         self.top.after(1000, self.run_lobby_loop)
         # Update the user list
         self.users = self.lobby.connected_users.keys()

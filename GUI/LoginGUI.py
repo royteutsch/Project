@@ -7,7 +7,7 @@
 import os
 import sys
 import tkinter as tk
-
+import logging
 import Client
 from GUI import LobbyGUI
 import webbrowser
@@ -145,9 +145,9 @@ class Toplevel1(GUI):
 
     def connect_to_user(self, Username, Password, ip, port):
         ulient_User = Client.User(Username, Password, ip, port)
-        print(ulient_User.success)
+        logging.info(ulient_User.success)
         if ulient_User.success:  # If the Client was created successfully
-            print("Client Creation Successful, switching GUI")
+            logging.info("Client Creation Successful, switching GUI")
             self.replaceGUI(LobbyGUI, self.top, [self.username, self.password, ulient_User])
         else:
             t = Toplevel(self.top)

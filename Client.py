@@ -26,15 +26,15 @@ class User:
 
         self.my_socket.send(
             ("C" + username + "|" + md5_hash).encode())  # Inquires if the username and password are valid
-        print("Checking Client Info")
+        logging.info("Checking Client Info")
         confirm = self.my_socket.recv(512).decode().lower()
-        print("Client Certificate received: " + confirm)
+        logging.info("Client Certificate received: " + confirm)
         if confirm == "yes":
-            print("Client is Authentic")
+            logging.info("Client is Authentic")
             self.username = username
             self.password = password
             self.success = True
-        print("Client Creation Successfull")
+        logging.info("Client Creation Successfull")
         self.my_socket.close()
 
     def get_connected_Clients(self):
@@ -42,7 +42,7 @@ class User:
 
     def parse_connected_clients(self, clients_string: str):
         clients_string = clients_string[1:]
-        print("Clients_string:"+clients_string)
+        logging.info("Clients_string:"+clients_string)
         self.client_name_list = ast.literal_eval(clients_string)
         self.changed = 1
 
@@ -51,18 +51,18 @@ class User:
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.my_socket.connect((self.ip, self.port))
         self.my_socket.send(("I" + str(lobby_id)).encode())
-        print("Checking if lobby exists")
+        logging.info("Checking if lobby exists")
         lobby_ip = str(self.my_socket.recv(1024).decode())
-        print(lobby_ip)
-        print(type(lobby_ip))
-        print(lobby_ip is not str(-1))
+        logging.info(lobby_ip)
+        logging.info(type(lobby_ip))
+        logging.info(lobby_ip is not str(-1))
         self.my_socket.close()
         if lobby_ip != str(-1):
             self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.my_socket.connect((lobby_ip, 5556))
             self.my_socket.send(("U" + self.username).encode())
             confirmation = self.my_socket.recv(1024).decode()
-            print("Username sent to server")
+            logging.info("Username sent to server")
             if confirmation == "yes":
                 return True
             else:
@@ -95,7 +95,7 @@ class Lobby:
         self.id = self.my_socket.recv(512).decode()
         self.bg_file_destination = ''
 
-        print("Finished making lobby credentials")
+        logging.info("Finished making lobby credentials")
         # Setting up the mini server
         self.SERVER_PORT = 5556
         self.SERVER_IP = '0.0.0.0'
@@ -129,10 +129,10 @@ class Lobby:
 
     def client_messege(self, current_socket: socket.socket):
         data = current_socket.recv(1024).decode()
-        print("Data: " + data)
-        print("Sender: " + str(current_socket))
+        logging.info("Data: " + data)
+        logging.info("Sender: " + str(current_socket))
         if data == "":
-            print("Connection closed with client")
+            logging.info("Connection closed with client")
             self.client_sockets.remove(current_socket)
             self.rlist.remove(current_socket)
             current_socket.close()
@@ -142,7 +142,7 @@ class Lobby:
             if command == "U":  # A new client has sent us their "U"sername
                 socket_address = self.socket_address_map[current_socket]
                 self.connected_users[params] = socket_address[0]
-                print("User " + params + " Added to user list")
+                logging.info("User " + params + " Added to user list")
             if command == "L":  # A client requested all the names of all clients connected to us
                 current_socket.send(("L" + self.send_names()).encode())
             if command == "D":  # A client drew a drawing, send it to all other clients
@@ -175,7 +175,7 @@ class Lobby:
             self.print_client_sockets(self.client_sockets)
             socket_address = self.socket_address_map[current_socket]
             self.connected_users[t.username] = socket_address[0]
-            print("User " + t.username + " Added to user list")
+            logging.info("User " + t.username + " Added to user list")
             root.destroy()
         else:
             root.after(100, lambda: self.check_popup(t, current_socket, root, connection_address))
@@ -190,23 +190,23 @@ class Lobby:
         bg_file = open(self.bg_file_destination, 'rb')
         message = str(bg_file.read())
         length = str(len(message))
-        print(length)
+        logging.info(length)
         length_of_length = str(len(length)).zfill(4)
         final_message = "B" + length_of_length + length + message
-        print("Bg: " + self.bg_file_destination)
+        logging.info("Bg: " + self.bg_file_destination)
         self.send_to_everyone(final_message)"""
         pass
 
     def one_loop(self):
-        print("main looping")
+        logging.info("main looping")
         self.rlist, wlist, xlist = select.select([self.server_socket] + self.client_sockets, [], [], 0.1)
-        print("rlist acquired")
+        logging.info("rlist acquired")
         for current_socket in self.rlist:
             if current_socket is self.server_socket:  # new client joins
                 self.newclient(current_socket, self.client_sockets)  # create new client
             else:  # what to do with new client
                 self.client_messege(current_socket)
-        print("responding to clients")
+        logging.info("responding to clients")
         for message in self.messages_to_send:
             current_socket, data = message
             if current_socket in wlist:
@@ -214,10 +214,10 @@ class Lobby:
                 self.messages_to_send.remove(message)
 
     def exit_protocol(self):
-        print("Closing sockets")
+        logging.info("Closing sockets")
         for client_socket in self.client_sockets:
             client_socket.close()
-        print("sending archive to server")
+        logging.info("sending archive to server")
         # Remove duplicates from self.data
         new_data = []
         for drawing in self.data:
@@ -229,10 +229,10 @@ class Lobby:
         length_of_length = str(len(length)).zfill(4)
         final_message = "F" + length_of_length + length + message
         self.my_socket.send(final_message.encode())
-        print("goodbye")
+        logging.info("goodbye")
 
     def send_to_everyone(self, message: str):
         # Sends Message to all clients
-        print("Message: "+message+" Sent to Everyone")
+        logging.info("Message: "+message+" Sent to Everyone")
         for current_socket in self.client_sockets:
             current_socket.send(message.encode())

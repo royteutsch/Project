@@ -10,7 +10,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
 from GUI import LobbyWaitGUI
-
+import logging
 # import connectGUI_support
 from GUI.BaselineGUI import GUI
 
@@ -82,7 +82,7 @@ class Toplevel1(GUI):
     def connect_to_lobby(self):
         connection_succesful = self.client.inquire_lobby(str(self.ID.get()).zfill(12))
         if connection_succesful:
-            print("Connection Successful")
+            logging.info("Connection Successful")
             self.replaceGUI(LobbyWaitGUI, self.top, [self.client, self.ID.get()])
         else:
             t = tk.Toplevel(self.top)

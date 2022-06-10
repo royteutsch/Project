@@ -12,7 +12,7 @@ root = Tk()
 button = Button(root, text = 'Geeks')
 button.pack(side = TOP, pady = 5)
 
-print('Running...')
+logging.info('Running...')
 # Calculating starting time
 start = time()
 
@@ -26,9 +26,9 @@ mainloop()
 
 # calculating end time
 end = time()
-print('Destroyed after % d seconds' % (end-start))
+logging.info('Destroyed after % d seconds' % (end-start))
 
 def doit():
-    print("5000 msec passed")
+    logging.info("5000 msec passed")
 
     root.after(5000, doit)

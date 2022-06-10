@@ -5,6 +5,7 @@
 #  in conjunction with Tcl version 8.6
 #    Feb 24, 2022 10:50:55 AM +0200  platform: Windows NT
 
+import logging
 import sys
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -102,7 +103,7 @@ class Toplevel1:
             strvar += str(item) + " "
         strvar = strvar[:-1]
         listvar = tk.StringVar(value=strvar)
-        print(listvar.get())
+        logging.info(listvar.get())
         return listvar
 
     def decide_on_name(self):
