@@ -84,8 +84,10 @@ class Toplevel1(GUI):
         else:
             self.replaceGUI(LoginGUI, self.top, [self.ip.get(), self.port])
 
-
-if __name__ == '__main__':
+def main():
     root = tk.Tk()
     t = Toplevel1(root)
     root.mainloop()
+
+if __name__ == '__main__':
+    main()

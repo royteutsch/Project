@@ -9,7 +9,7 @@ import sys
 import tkinter as tk
 
 import Client
-import LobbyGUI
+from GUI import LobbyGUI
 import webbrowser
 from tkinter import *
 

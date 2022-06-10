@@ -8,9 +8,9 @@
 import sys
 import tkinter as tk
 import tkinter.ttk as ttk
-import LoginGUI
-import connectGUI
-import LobbyCreationGUI
+from GUI import LoginGUI
+from GUI import connectGUI
+from GUI import LobbyCreationGUI
 from GUI.BaselineGUI import GUI
 
 

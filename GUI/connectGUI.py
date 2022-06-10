@@ -9,7 +9,7 @@ import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
-import LobbyWaitGUI
+from GUI import LobbyWaitGUI
 
 # import connectGUI_support
 from GUI.BaselineGUI import GUI
